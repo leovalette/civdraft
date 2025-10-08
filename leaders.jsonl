@@ -1,0 +1,86 @@
+{"name":"Abraham Lincoln", "civilization":"America", "filters":["Abraham Lincoln", "America"], "imageName":"abraham_lincoln.png"}
+{"name":"Ahiram", "civilization":"Phoenicia", "filters":["Ahiram", "Phoenicia"], "imageName":"ahiram.png"}
+{"name":"Al-Hasan ibn Sulaiman", "civilization":"Swahili", "filters":["Al-Hasan ibn Sulaiman", "Swahili"], "imageName":"al_hasan.png"}
+{"name":"Alexander", "civilization":"Macedon", "filters":["Alexander", "Macedon"], "imageName":"alexander.png"}
+{"name":"Eleanor of Aquitaine (England)", "civilization":"England", "filters":["Eleanor of Aquitaine", "England"], "imageName":"eleanor_england.png"}
+{"name":"Eleanor of Aquitaine (France)", "civilization":"France", "filters":["Eleanor of Aquitaine", "France"], "imageName":"eleanor_france.png"}
+{"name":"Amanitore", "civilization":"Nubia", "filters":["Amanitore", "Nubia"], "imageName":"amanitore.png"}
+{"name":"Ambiorix", "civilization":"Gaul", "filters":["Ambiorix", "Gaul"], "imageName":"ambiorix.png"}
+{"name":"Bà triêu", "civilization":"Vietnam", "filters":["Bà triêu", "Vietnam"], "imageName":"ba_trieu.png"}
+{"name":"Basil II", "civilization":"Byzantium", "filters":["Basil II", "Byzantium"], "imageName":"basil_ii.png"}
+{"name":"Catherine de Medici (Black Queen)", "civilization":"France", "filters":["Catherine de Medici Black Queen", "France"], "imageName":"catherine_de_medici_black_queen.png"}
+{"name":"Catherine de Medici (Manificence)", "civilization":"France", "filters":["Catherine de Medici Manificence", "France"], "imageName":"catherine_de_medici_manificence.png"}
+{"name":"Julius Caesar", "civilization":"Rome", "filters":["Julius Caesar", "Rome"], "imageName":"julius_caesar.png"}
+{"name":"Shaka", "civilization":"Zulu", "filters":["Shaka", "Zulu"], "imageName":"shaka.png"}
+{"name":"Chandragupta", "civilization":"India", "filters":["Chandragupta", "India"], "imageName":"chandragupta.png"}
+{"name":"Kristina", "civilization":"Sweden", "filters":["Kristina", "Sweden"], "imageName":"kristina.png"}
+{"name":"Cleopatra (Egyptian)", "civilization":"Egypt", "filters":["Cleopatra Egyptian", "Egypt"], "imageName":"cleopatra_egyptian.png"}
+{"name":"Cleopatra (Ptolemaic)", "civilization":"Egypt", "filters":["Cleopatra Ptolemaic", "Egypt"], "imageName":"cleopatra_ptolemaic.png"}
+{"name":"Cyrus", "civilization":"Persia", "filters":["Cyrus", "Persia"], "imageName":"cyrus.png"}
+{"name":"Lady Six Sky", "civilization":"Maya", "filters":["Lady Six Sky", "Maya"], "imageName":"lady_six_sky.png"}
+{"name":"Dido", "civilization":"Phoenicia", "filters":["Dido", "Phoenicia"], "imageName":"dido.png"}
+{"name":"Gitarja", "civilization":"Indonesia", "filters":["Gitarja", "Indonesia"], "imageName":"gitarja.png"}
+{"name":"Frederick Barbarossa", "civilization":"Germany", "filters":["Frederick Barbarossa", "Germany"], "imageName":"frederick_barbarossa.png"}
+{"name":"Gandhi", "civilization":"India", "filters":["Gandhi", "India"], "imageName":"gandhi.png"}
+{"name":"Genghis Khan", "civilization":"Mongolia", "filters":["Genghis Khan", "Mongolia"], "imageName":"genghis_khan.png"}
+{"name":"Gilgamesh", "civilization":"Sumeria", "filters":["Gilgamesh", "Sumeria"], "imageName":"gilgamesh.png"}
+{"name":"Gorgo", "civilization":"Greece", "filters":["Gorgo", "Greece"], "imageName":"gorgo.png"}
+{"name":"Hammurabi", "civilization":"Babylon", "filters":["Hammurabi", "Babylon"], "imageName":"hammurabi.png"}
+{"name":"Harald Hardrada", "civilization":"Norway", "filters":["Harald Hardrada", "Norway"], "imageName":"harald_hardrada.png"}
+{"name":"Jadwiga", "civilization":"Poland", "filters":["Jadwiga", "Poland"], "imageName":"jadwiga.png"}
+{"name":"Hõjõ Tokimune", "civilization":"Japan", "filters":["Hõjõ Tokimune", "Japan"], "imageName":"hõjõ_tokimune.png"}
+{"name":"Jaravarman VII", "civilization":"Khmer", "filters":["Jaravarman VII", "Khmer"], "imageName":"jaravarman_vii.png"}
+{"name":"Joao III", "civilization":"Portugal", "filters":["Joao III", "Portugal"], "imageName":"joao_iii.png"}
+{"name":"John Curtin", "civilization":"Australia", "filters":["John Curtin", "Australia"], "imageName":"john_curtin.png"}
+{"name":"Kiviuq", "civilization":"Thule", "filters":["Kiviuq", "Thule"], "imageName":"kiviuq.png"}
+{"name":"Kublai Khan (China)", "civilization":"China", "filters":["Kublai Khan China", "China"], "imageName":"kublai_khan_china.png"}
+{"name":"Kublai Khan (Mongolia)", "civilization":"Mongolia", "filters":["Kublai Khan Mongolia", "Mongolia"], "imageName":"kublai_khan_mongolia.png"}
+{"name":"Kupe", "civilization":"Maori", "filters":["Kupe", "Maori"], "imageName":"kupe.png"}
+{"name":"Lautaro", "civilization":"Mapuche", "filters":["Lautaro", "Mapuche"], "imageName":"lautaro.png"}
+{"name":"Mansa Musa", "civilization":"Mali", "filters":["Mansa Musa", "Mali"], "imageName":"mansa_musa.png"}
+{"name":"Matthias Corvinus", "civilization":"Hungary", "filters":["Matthias Corvinus", "Hungary"], "imageName":"matthias_corvinus.png"}
+{"name":"Menelik II", "civilization":"Ethiopia", "filters":["Menelik II", "Ethiopia"], "imageName":"menelik_ii.png"}
+{"name":"Moctezuma", "civilization":"Aztec", "filters":["Moctezuma", "Aztec"], "imageName":"moctezuma.png"}
+{"name":"Mvemba a Nzinga", "civilization":"Kongo", "filters":["Mvemba a Nzinga", "Kongo"], "imageName":"mvemba_a_nzinga.png"}
+{"name":"Nader Shah", "civilization":"Persia", "filters":["Nader Shah", "Persia"], "imageName":"nader_shah.png"}
+{"name":"Nzinga Mbande", "civilization":"Kongo", "filters":["Nzinga Mbande", "Kongo"], "imageName":"nzinga_mbande.png"}
+{"name":"Olympias", "civilization":"Macedon", "filters":["Olympias", "Macedon"], "imageName":"olympias.png"}
+{"name":"Pachacuti", "civilization":"Inca", "filters":["Pachacuti", "Inca"], "imageName":"pachacuti.png"}
+{"name":"Pericles", "civilization":"Greece", "filters":["Pericles", "Greece"], "imageName":"pericles.png"}
+{"name":"Philip II", "civilization":"Spain", "filters":["Philip II", "Spain"], "imageName":"philip_ii.png"}
+{"name":"Peter", "civilization":"Russia", "filters":["Peter the Great", "Russia"], "imageName":"peter_the_great.png"}
+{"name":"Pedro II", "civilization":"Brazil", "filters":["Pedro II", "Brazil"], "imageName":"pedro_ii.png"}
+{"name":"Poundmaker", "civilization":"Cree", "filters":["Poundmaker", "Cree"], "imageName":"poundmaker.png"}
+{"name":"Qin (Mandate of Heaven)", "civilization":"China", "filters":["Qin Mandate of Heaven", "China"], "imageName":"qin_mandate_of_heaven.png"}
+{"name":"Qin (Unifier)", "civilization":"China", "filters":["Qin Unifier", "China"], "imageName":"qin_unifier.png"}
+{"name":"Ramses II", "civilization":"Egypt", "filters":["Ramses II", "Egypt"], "imageName":"ramses_ii.png"}
+{"name":"Robert the Bruce", "civilization":"Scotland", "filters":["Robert the Bruce", "Scotland"], "imageName":"robert_the_bruce.png"}
+{"name":"Saladin (Sultan)", "civilization":"Arabia", "filters":["Saladin Sultan", "Arabia"], "imageName":"saladin_sultan.png"}
+{"name":"Saladin (Vizier)", "civilization":"Arabia", "filters":["Saladin Vizier", "Arabia"], "imageName":"saladin_vizier.png"}
+{"name":"Seondeok", "civilization":"Korea", "filters":["Seondeok", "Korea"], "imageName":"seondeok.png"}
+{"name":"Simon Bolivar", "civilization":"Gran Colombia", "filters":["Simon Bolivar", "Gran Colombia"], "imageName":"simon_bolivar.png"}
+{"name":"Suleiman (Kanuni)", "civilization":"Ottomans", "filters":["Suleiman Kanuni", "Ottomans"], "imageName":"suleiman_kanuni.png"}
+{"name":"Suleiman (Muhtesem)", "civilization":"Ottomans", "filters":["Suleiman Muhtesem", "Ottomans"], "imageName":"suleiman_muhtesem.png"}
+{"name":"Soundiata Keita", "civilization":"Mali", "filters":["Soundiata Keita", "Mali"], "imageName":"soundiata_keita.png"}
+{"name":"Spearthrower Owl", "civilization":"Teotihuacanas", "filters":["Spearthrower Owl", "Teotihuacanas"], "imageName":"spearthrower_owl.png"}
+{"name":"Tamar", "civilization":"Georgia", "filters":["Tamar", "Georgia"], "imageName":"tamar.png"}
+{"name":"Theodore Roosevelt (Bull Moose)", "civilization":"America", "filters":["Theodore Roosevelt Bull Moose", "America"], "imageName":"theodore_roosevelt_bull_moose.png"}
+{"name":"Theodore Roosevelt (Rough Rider)", "civilization":"America", "filters":["Theodore Roosevelt Rough Rider", "America"], "imageName":"theodore_roosevelt_rough_rider.png"}
+{"name":"Te' K'inich II", "civilization":"Maya", "filters":["Te' K'inich II", "Maya"], "imageName":"Te'_K'inich_ii.png"}
+{"name":"Tokugawa", "civilization":"Japan", "filters":["Tokugawa", "Japan"], "imageName":"tokugawa.png"}
+{"name":"Tomyris", "civilization":"Scythia", "filters":["Tomyris", "Scythia"], "imageName":"tomyris.png"}
+{"name":"Trajan", "civilization":"Rome", "filters":["Trajan", "Rome"], "imageName":"trajan.png"}
+{"name":"Trisong Detsen", "civilization":"Tibet", "filters":["Trisong Detsen", "Tibet"], "imageName":"trisong_detsen.png"}
+{"name":"Vercingetorix", "civilization":"Gaul", "filters":["Vercingetorix", "Gaul"], "imageName":"vercingetorix.png"}
+{"name":"Victoria", "civilization":"England", "filters":["Victoria", "England"], "imageName":"victoria.png"}
+{"name":"Wilfrid Laurier", "civilization":"Canada", "filters":["Wilfrid Laurier", "Canada"], "imageName":"wilfrid_laurier.png"}
+{"name":"Wilhelmina", "civilization":"Netherlands", "filters":["Wilhelmina", "Netherlands"], "imageName":"wilhelmina.png"}
+{"name":"Wu Zetian", "civilization":"China", "filters":["Wu Zetian", "China"], "imageName":"wu_zetian.png"}
+{"name":"Yongle", "civilization":"China", "filters":["Yongle", "China"], "imageName":"yongle.png"}
+{"name":"Ludwig II", "civilization":"Germany", "filters":["Ludwig II", "Germany"], "imageName":"ludwig_ii.png"}
+{"name":"Sejong", "civilization":"Korea", "filters":["Sejong", "Korea"], "imageName":"sejong.png"}
+{"name":"Theodora", "civilization":"Byzantium", "filters":["Theodora", "Byzantium"], "imageName":"theodora.png"}
+{"name":"Victoria Age of Steam", "civilization":"England", "filters":["Victoria Age of Steam", "England"], "imageName":"victoria_age_of_steam.png"}
+{"name":"Harald Varangian", "civilization":"Norway", "filters":["Harald Varangian", "Norway"], "imageName":"harald_varangian.png"}
+{"name":"Elizabeth I", "civilization":"England", "filters":["Elizabeth I", "England"], "imageName":"elizabeth_i.png"}
+{"name":"TIMEOUT", "civilization":"", "filters":[], "imageName":"timeout.png"}
