@@ -41,14 +41,6 @@ import {
 import { cn } from "@/lib/utils";
 import { api } from "../../convex/_generated/api";
 
-const modes = [
-  { label: "1v1", value: "1v1" },
-  { label: "2v2", value: "2v2" },
-  { label: "3v3", value: "3v3" },
-  { label: "4v4", value: "4v4" },
-  { label: "FFA", value: "ffa" },
-];
-
 const formSchema = z.object({
   team1Name: z.string().optional(),
   team2Name: z.string().optional(),
@@ -59,7 +51,9 @@ const formSchema = z.object({
 });
 
 export default function Home() {
-  const leaders = useQuery(api.leaders.getLeaderNames);
+  const leaders = useQuery(api.leaders.get);
+  const modes = useQuery(api.presets.get);
+
   const [openCombobox, setOpenCombobox] = useState(false);
   const [selectedCivs, setSelectedCivs] = useState<string[]>([]);
 
@@ -145,9 +139,9 @@ export default function Home() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {modes.map((mode) => (
-                        <SelectItem key={mode.value} value={mode.value}>
-                          {mode.label}
+                      {modes?.map(({ _id: id, label }) => (
+                        <SelectItem key={id} value={id}>
+                          {label}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -187,16 +181,14 @@ export default function Home() {
                         <CommandList>
                           <CommandEmpty>No leader found.</CommandEmpty>
                           <CommandGroup>
-                            {leaders?.map((leader) => (
+                            {leaders?.map(({ _id: id, name }) => (
                               <CommandItem
-                                key={leader}
-                                value={leader}
+                                key={id}
+                                value={id}
                                 onSelect={() => {
-                                  const newSelected = selectedCivs.includes(
-                                    leader,
-                                  )
-                                    ? selectedCivs.filter((v) => v !== leader)
-                                    : [...selectedCivs, leader];
+                                  const newSelected = selectedCivs.includes(id)
+                                    ? selectedCivs.filter((v) => v !== id)
+                                    : [...selectedCivs, id];
                                   setSelectedCivs(newSelected);
                                   field.onChange(newSelected);
                                 }}
@@ -204,12 +196,12 @@ export default function Home() {
                                 <Check
                                   className={cn(
                                     "mr-2 h-4 w-4",
-                                    selectedCivs.includes(leader)
+                                    selectedCivs.includes(id)
                                       ? "opacity-100"
                                       : "opacity-0",
                                   )}
                                 />
-                                {leader}
+                                {name}
                               </CommandItem>
                             ))}
                           </CommandGroup>

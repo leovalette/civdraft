@@ -14,6 +14,7 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as leaders from "../leaders.js";
+import type * as presets from "../presets.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -25,6 +26,7 @@ import type * as leaders from "../leaders.js";
  */
 declare const fullApi: ApiFromModules<{
   leaders: typeof leaders;
+  presets: typeof presets;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,
