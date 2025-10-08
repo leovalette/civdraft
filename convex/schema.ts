@@ -14,6 +14,7 @@ export default defineSchema({
   }),
   presets: defineTable({
     name: v.string(),
+    label: v.string(),
     mapIds: v.array(v.id("maps")),
     autoBannedLeaderIds: v.array(v.id("leaders")),
     numberOfBansFirstRotation: v.number(),
