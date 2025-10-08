@@ -1,8 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { Check, ChevronsUpDown } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -40,6 +41,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { api } from "../../convex/_generated/api";
+import type { Id } from "../../convex/_generated/dataModel";
 
 const formSchema = z.object({
   team1Name: z.string().optional(),
@@ -53,6 +55,8 @@ const formSchema = z.object({
 export default function Home() {
   const leaders = useQuery(api.leaders.get);
   const modes = useQuery(api.presets.get);
+  const createLobby = useMutation(api.lobbies.create);
+  const router = useRouter();
 
   const [openCombobox, setOpenCombobox] = useState(false);
   const [selectedCivs, setSelectedCivs] = useState<string[]>([]);
@@ -100,9 +104,29 @@ export default function Home() {
     }
   }, [selectedMode, modes, form]);
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    // Handle form submission here
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    // Find the selected preset to get all required data
+    const preset = modes?.find((m) => m._id === values.mode);
+
+    try {
+      // Create the lobby with all required parameters
+      const lobbyId = await createLobby({
+        team1Name: values.team1Name || "Team 1",
+        team2Name: values.team2Name || "Team 2",
+        autoBannedLeaderIds: (values.autobanCivs || []) as Id<"leaders">[],
+        numberOfBansFirstRotation: preset?.numberOfBansFirstRotation,
+        numberOfBansSecondRotation: preset?.numberOfBansSecondRotation,
+        numberOfPicksFirstRotation: preset?.numberOfPicksFirstRotation,
+        numberOfPicksSecondRotation: preset?.numberOfPicksSecondRotation,
+        mapIds: preset?.mapIds,
+        mapDraft: values.mapDraft,
+      });
+
+      // Navigate to the lobby page
+      router.push(`/lobbies/${lobbyId}`);
+    } catch (error) {
+      console.error("Failed to create lobby:", error);
+    }
   }
 
   return (

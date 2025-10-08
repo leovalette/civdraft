@@ -14,6 +14,7 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as leaders from "../leaders.js";
+import type * as lobbies from "../lobbies.js";
 import type * as presets from "../presets.js";
 
 /**
@@ -26,6 +27,7 @@ import type * as presets from "../presets.js";
  */
 declare const fullApi: ApiFromModules<{
   leaders: typeof leaders;
+  lobbies: typeof lobbies;
   presets: typeof presets;
 }>;
 export declare const api: FilterApi<
