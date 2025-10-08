@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "convex/react";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -38,6 +39,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { api } from "../../convex/_generated/api";
 
 const modes = [
   { label: "1v1", value: "1v1" },
@@ -45,29 +47,6 @@ const modes = [
   { label: "3v3", value: "3v3" },
   { label: "4v4", value: "4v4" },
   { label: "FFA", value: "ffa" },
-];
-
-const civs = [
-  { label: "America", value: "america" },
-  { label: "Arabia", value: "arabia" },
-  { label: "Australia", value: "australia" },
-  { label: "Aztec", value: "aztec" },
-  { label: "Brazil", value: "brazil" },
-  { label: "China", value: "china" },
-  { label: "Egypt", value: "egypt" },
-  { label: "England", value: "england" },
-  { label: "France", value: "france" },
-  { label: "Germany", value: "germany" },
-  { label: "Greece", value: "greece" },
-  { label: "India", value: "india" },
-  { label: "Japan", value: "japan" },
-  { label: "Kongo", value: "kongo" },
-  { label: "Norway", value: "norway" },
-  { label: "Rome", value: "rome" },
-  { label: "Russia", value: "russia" },
-  { label: "Scythia", value: "scythia" },
-  { label: "Spain", value: "spain" },
-  { label: "Sumeria", value: "sumeria" },
 ];
 
 const formSchema = z.object({
@@ -80,6 +59,7 @@ const formSchema = z.object({
 });
 
 export default function Home() {
+  const leaders = useQuery(api.leaders.getLeaderNames);
   const [openCombobox, setOpenCombobox] = useState(false);
   const [selectedCivs, setSelectedCivs] = useState<string[]>([]);
 
@@ -205,20 +185,18 @@ export default function Home() {
                       <Command>
                         <CommandInput placeholder="Search civs..." />
                         <CommandList>
-                          <CommandEmpty>No civ found.</CommandEmpty>
+                          <CommandEmpty>No leader found.</CommandEmpty>
                           <CommandGroup>
-                            {civs.map((civ) => (
+                            {leaders?.map((leader) => (
                               <CommandItem
-                                key={civ.value}
-                                value={civ.value}
+                                key={leader}
+                                value={leader}
                                 onSelect={() => {
                                   const newSelected = selectedCivs.includes(
-                                    civ.value,
+                                    leader,
                                   )
-                                    ? selectedCivs.filter(
-                                        (v) => v !== civ.value,
-                                      )
-                                    : [...selectedCivs, civ.value];
+                                    ? selectedCivs.filter((v) => v !== leader)
+                                    : [...selectedCivs, leader];
                                   setSelectedCivs(newSelected);
                                   field.onChange(newSelected);
                                 }}
@@ -226,12 +204,12 @@ export default function Home() {
                                 <Check
                                   className={cn(
                                     "mr-2 h-4 w-4",
-                                    selectedCivs.includes(civ.value)
+                                    selectedCivs.includes(leader)
                                       ? "opacity-100"
                                       : "opacity-0",
                                   )}
                                 />
-                                {civ.label}
+                                {leader}
                               </CommandItem>
                             ))}
                           </CommandGroup>
