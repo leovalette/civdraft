@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "convex/react";
 import { Check, ChevronsUpDown } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -69,6 +69,36 @@ export default function Home() {
       mapDraft: false,
     },
   });
+
+  // Watch for mode changes
+  const selectedMode = form.watch("mode");
+
+  useEffect(() => {
+    if (selectedMode && modes) {
+      const preset = modes.find((m) => m._id === selectedMode);
+      if (preset) {
+        // Update mapDraft checkbox based on mapIds array
+        if (preset.mapIds && preset.mapIds.length > 0) {
+          form.setValue("mapDraft", true);
+        } else {
+          form.setValue("mapDraft", false);
+        }
+
+        // Update autobanCivs based on autoBannedLeaderIds array
+        if (
+          preset.autoBannedLeaderIds &&
+          preset.autoBannedLeaderIds.length > 0
+        ) {
+          const leaderIds = preset.autoBannedLeaderIds;
+          setSelectedCivs(leaderIds);
+          form.setValue("autobanCivs", leaderIds);
+        } else {
+          setSelectedCivs([]);
+          form.setValue("autobanCivs", []);
+        }
+      }
+    }
+  }, [selectedMode, modes, form]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
