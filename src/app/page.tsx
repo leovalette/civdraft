@@ -39,6 +39,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { setUserPseudo } from "@/lib/user";
 import { cn } from "@/lib/utils";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
@@ -107,6 +108,11 @@ export default function Home() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Find the selected preset to get all required data
     const preset = modes?.find((m) => m._id === values.mode);
+
+    // Save the pseudo if provided
+    if (values.pseudo) {
+      setUserPseudo(values.pseudo);
+    }
 
     try {
       // Create the lobby with all required parameters
