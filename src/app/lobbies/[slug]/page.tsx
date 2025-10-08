@@ -19,6 +19,7 @@ export default function LobbyPage({
   const joinObservers = useMutation(api.lobbies.joinObservers);
   const joinTeam1 = useMutation(api.lobbies.joinTeam1);
   const joinTeam2 = useMutation(api.lobbies.joinTeam2);
+  const toggleTeamReady = useMutation(api.lobbies.toggleTeamReady);
 
   const [copied, setCopied] = useState(false);
   const [userPseudo, setUserPseudo] = useState("");
@@ -54,6 +55,15 @@ export default function LobbyPage({
     }
   }, [userId, userPseudo, lobbyId, joinObservers]);
 
+  const handleToggleReady = useCallback(() => {
+    if (userId) {
+      toggleTeamReady({
+        lobbyId,
+        playerId: userId,
+      });
+    }
+  }, [userId, lobbyId, toggleTeamReady]);
+
   useEffect(() => {
     // Get or generate user identification on mount
     const pseudo = getUserPseudo();
@@ -65,7 +75,7 @@ export default function LobbyPage({
       playerPseudo: pseudo,
       playerId: id,
     });
-  }, []);
+  }, [joinObservers, lobbyId]);
 
   const copyToClipboard = async () => {
     const url = window.location.href;
@@ -171,7 +181,10 @@ export default function LobbyPage({
 
       {/* Ready Button */}
       <div className="flex justify-center w-full max-w-6xl">
-        <Button className="bg-slate-800 hover:bg-slate-700 text-white px-12 py-3 rounded-full text-lg">
+        <Button
+          className="bg-slate-800 hover:bg-slate-700 text-white px-12 py-3 rounded-full text-lg"
+          onClick={handleToggleReady}
+        >
           Ready
         </Button>
       </div>

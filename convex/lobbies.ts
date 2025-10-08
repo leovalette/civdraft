@@ -40,12 +40,14 @@ export const create = mutation({
         selectedLeaders: [],
         bannedLeaders: [],
         players: [],
+        isReady: false,
       },
       team2: {
         name: team2Name,
         selectedLeaders: [],
         bannedLeaders: [],
         players: [],
+        isReady: false,
       },
       observers: [],
       autoBannedLeaderIds,
@@ -178,6 +180,38 @@ export const renamePlayer = mutation({
       observers: lobby.observers.map((p) =>
         p.id === playerId ? { ...p, pseudo: newPseudo } : p,
       ),
+    });
+  },
+});
+
+export const toggleTeamReady = mutation({
+  args: {
+    lobbyId: v.id("lobbies"),
+    playerId: v.string(),
+  },
+  handler: async (ctx, { lobbyId, playerId }) => {
+    const lobby = await ctx.db.get(lobbyId);
+    if (!lobby) {
+      throw new Error("Lobby not found");
+    }
+
+    const isPlayerInTeam1 = lobby.team1.players.find(
+      ({ id }) => id === playerId,
+    );
+    const isPlayerInTeam2 = lobby.team2.players.find(
+      ({ id }) => id === playerId,
+    );
+    if (!isPlayerInTeam1 && !isPlayerInTeam2) {
+      throw new Error("Player not in any team");
+    }
+
+    await ctx.db.patch(lobbyId, {
+      team1: isPlayerInTeam1
+        ? { ...lobby.team1, isReady: !lobby.team1.isReady }
+        : { ...lobby.team1 },
+      team2: isPlayerInTeam2
+        ? { ...lobby.team2, isReady: !lobby.team2.isReady }
+        : { ...lobby.team2 },
     });
   },
 });
