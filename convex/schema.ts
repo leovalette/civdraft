@@ -50,6 +50,7 @@ export default defineSchema({
     numberOfPicksFirstRotation: v.number(),
     numberOfPicksSecondRotation: v.number(),
     mapIds: v.array(v.id("maps")),
+    bannedMapIds: v.array(v.id("maps")),
     selectedMapId: v.optional(v.id("maps")),
   }),
 });

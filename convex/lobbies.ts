@@ -56,6 +56,7 @@ export const create = mutation({
       numberOfPicksFirstRotation: numberOfPicksFirstRotation ?? 4,
       numberOfPicksSecondRotation: numberOfPicksSecondRotation ?? 4,
       mapIds: finalMapIds,
+      bannedMapIds: [],
     });
   },
 });

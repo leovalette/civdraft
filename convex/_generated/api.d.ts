@@ -15,6 +15,7 @@ import type {
 } from "convex/server";
 import type * as leaders from "../leaders.js";
 import type * as lobbies from "../lobbies.js";
+import type * as mapDraft from "../mapDraft.js";
 import type * as presets from "../presets.js";
 
 /**
@@ -28,6 +29,7 @@ import type * as presets from "../presets.js";
 declare const fullApi: ApiFromModules<{
   leaders: typeof leaders;
   lobbies: typeof lobbies;
+  mapDraft: typeof mapDraft;
   presets: typeof presets;
 }>;
 export declare const api: FilterApi<
