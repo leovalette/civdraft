@@ -33,6 +33,7 @@ export default defineSchema({
       name: v.string(),
       selectedLeaders: v.array(v.id("leaders")),
       bannedLeaders: v.array(v.id("leaders")),
+      bannedMaps: v.array(v.id("maps")),
       players: v.array(v.object({ id: v.string(), pseudo: v.string() })),
       isReady: v.boolean(),
     }),
@@ -40,6 +41,7 @@ export default defineSchema({
       name: v.string(),
       selectedLeaders: v.array(v.id("leaders")),
       bannedLeaders: v.array(v.id("leaders")),
+      bannedMaps: v.array(v.id("maps")),
       players: v.array(v.object({ id: v.string(), pseudo: v.string() })),
       isReady: v.boolean(),
     }),
@@ -52,5 +54,6 @@ export default defineSchema({
     mapIds: v.array(v.id("maps")),
     bannedMapIds: v.array(v.id("maps")),
     selectedMapId: v.optional(v.id("maps")),
+    currentMapBanTeam: v.optional(v.union(v.literal(1), v.literal(2))),
   }),
 });
