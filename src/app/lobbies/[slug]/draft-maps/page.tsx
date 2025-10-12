@@ -5,11 +5,11 @@ import { X } from "lucide-react"
 import Image from "next/image"
 import { use, useEffect, useMemo, useState } from "react"
 import { LeaderOrMap } from "@/components/Leader"
+import { TeamHeaders } from "@/components/TeamHeaders"
+import { TeamSelection } from "@/components/TeamSelection"
 import { Button } from "@/components/ui/button"
 import { api } from "../../../../../convex/_generated/api"
 import type { Id } from "../../../../../convex/_generated/dataModel"
-import { TeamHeaders } from "@/components/TeamHeaders"
-import { TeamSelection } from "@/components/TeamSelection"
 
 export default function DraftMapsPage({
   params,
@@ -57,7 +57,7 @@ export default function DraftMapsPage({
     return lobby.bannedMapIds.length === 0
       ? allMaps
       : allMaps.filter((map) => lobby.mapIds.includes(map._id))
-  }, [lobby, selectedMapId, allMaps])
+  }, [lobby, allMaps])
 
   const filteredMaps = useMemo(() => {
     if (!lobby) return []
@@ -70,21 +70,25 @@ export default function DraftMapsPage({
   return (
     <div className="flex  h-screen w-full flex-col items-center justify-center gap-2 px-8 text-text-primary">
       <div className="w-full">
-        {lobby && <TeamHeaders
-          team1={lobby.team1.name ?? 'Team 1'}
-          team2={lobby.team2.name ?? 'Team 2'}
-          currentStatus={`${lobby.draftStatus.type}${lobby.draftStatus.index}`}
-        />}
+        {lobby && (
+          <TeamHeaders
+            team1={lobby.team1.name ?? "Team 1"}
+            team2={lobby.team2.name ?? "Team 2"}
+            currentStatus={`${lobby.draftStatus.type}${lobby.draftStatus.index}`}
+          />
+        )}
       </div>
       <div className="flex h-4/5 w-full justify-between gap-4">
         <div className="flex flex-col gap-6">
           <TeamSelection
-            leaderOrMaps={team1BannedMaps?.map((map) => ({
-              id: map._id,
-              name: map.name,
-              imageName: map.imageName,
-              type: "map",
-            })) ?? []}
+            leaderOrMaps={
+              team1BannedMaps?.map((map) => ({
+                id: map._id,
+                name: map.name,
+                imageName: map.imageName,
+                type: "map",
+              })) ?? []
+            }
             numberOfPicks={availableMaps.length / 2}
           />
         </div>
@@ -111,21 +115,25 @@ export default function DraftMapsPage({
                 onClick={() => setSelectedMapId(map._id)}
               />
             ))}
-          </div>            <Button
+          </div>{" "}
+          <Button
             className="mt-4"
             disabled={!selectedMapId}
             onClick={handleConfirm}
           >
             Confirm
           </Button>
-        </div> <div className="flex flex-col gap-6">
+        </div>{" "}
+        <div className="flex flex-col gap-6">
           <TeamSelection
-            leaderOrMaps={team2BannedMaps?.map((map) => ({
-              id: map._id,
-              name: map.name,
-              imageName: map.imageName,
-              type: "map",
-            })) ?? []}
+            leaderOrMaps={
+              team2BannedMaps?.map((map) => ({
+                id: map._id,
+                name: map.name,
+                imageName: map.imageName,
+                type: "map",
+              })) ?? []
+            }
             numberOfPicks={availableMaps.length / 2}
           />
           {/* <Chat
