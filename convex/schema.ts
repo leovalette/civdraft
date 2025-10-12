@@ -51,6 +51,7 @@ export default defineSchema({
     numberOfBansSecondRotation: v.number(),
     numberOfPicksFirstRotation: v.number(),
     numberOfPicksSecondRotation: v.number(),
+    withMapDraft: v.boolean(),
     mapIds: v.array(v.id("maps")),
     bannedMapIds: v.array(v.id("maps")),
     selectedMapId: v.optional(v.id("maps")),

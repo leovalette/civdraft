@@ -67,6 +67,7 @@ export const create = mutation({
         type: "BAN",
         index: 1
       },
+      withMapDraft: mapDraft,
     })
   },
 })
