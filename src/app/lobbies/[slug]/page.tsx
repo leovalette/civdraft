@@ -5,6 +5,7 @@ import Image from "next/image"
 import { use, useCallback, useEffect, useMemo, useState } from "react"
 import { EditText, type onSaveProps } from "react-edit-text"
 import { Tooltip } from "react-tooltip"
+import { CivPrimaryButton } from "@/components/CivPrimaryButton"
 import { Button } from "@/components/ui/button"
 import { getUserId, getUserPseudo } from "@/lib/user"
 import { api } from "../../../../convex/_generated/api"
@@ -106,13 +107,16 @@ export default function LobbyPage({
     await navigator.clipboard.writeText(url)
   }
 
-  const onRenamePlayer = useCallback(({ value }: onSaveProps) => {
-    if (!lobby) {
-      return
-    }
-    setUserPseudo(value)
-    renamePlayer({ lobbyId: lobby._id, playerId: userId, newPseudo: value })
-  }, [lobby, renamePlayer, userId])
+  const onRenamePlayer = useCallback(
+    ({ value }: onSaveProps) => {
+      if (!lobby) {
+        return
+      }
+      setUserPseudo(value)
+      renamePlayer({ lobbyId: lobby._id, playerId: userId, newPseudo: value })
+    },
+    [lobby, renamePlayer, userId],
+  )
 
   const showPlayerPseudo = (player: { id: string; pseudo: string }) => {
     if (player.id === userId) {
@@ -143,7 +147,7 @@ export default function LobbyPage({
   return (
     <div className="flex h-screen w-10/12 flex-col text-white">
       <div className="mt-9 flex w-full justify-center p-4">
-        <Button onClick={getUrl}>Get draft url</Button>
+        <CivPrimaryButton onClick={getUrl}>Get draft url</CivPrimaryButton>
       </div>
       <div className="grid w-full grid-cols-3 gap-4">
         <div className="mb-2 flex h-5 justify-center text-xl font-extrabold uppercase text-ready">

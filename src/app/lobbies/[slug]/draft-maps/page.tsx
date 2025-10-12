@@ -4,6 +4,7 @@ import { useMutation, useQuery } from "convex/react"
 import { X } from "lucide-react"
 import Image from "next/image"
 import { use, useEffect, useMemo, useState } from "react"
+import { CivPrimaryButton } from "@/components/CivPrimaryButton"
 import { LeaderOrMap } from "@/components/Leader"
 import { TeamHeaders } from "@/components/TeamHeaders"
 import { TeamSelection } from "@/components/TeamSelection"
@@ -115,14 +116,15 @@ export default function DraftMapsPage({
                 onClick={() => setSelectedMapId(map._id)}
               />
             ))}
-          </div>{" "}
-          <Button
-            className="mt-4"
-            disabled={!selectedMapId}
-            onClick={handleConfirm}
-          >
-            Confirm
-          </Button>
+          </div>
+          <div className="mt-4"          >
+            <CivPrimaryButton
+              disabled={!selectedMapId}
+              onClick={handleConfirm}
+            >
+              Confirm
+            </CivPrimaryButton>
+          </div>
         </div>{" "}
         <div className="flex flex-col gap-6">
           <TeamSelection
@@ -144,14 +146,13 @@ export default function DraftMapsPage({
           /> */}
         </div>
       </div>
-      <div className="flex w-full items-center justify-between">
-        <Button
-          className="mt-4"
+      <div className="flex w-full items-center justify-between mt-4">
+        <CivPrimaryButton
           disabled={!selectedMapId}
           onClick={handleConfirm}
         >
           Confirm
-        </Button>
+        </CivPrimaryButton>
         {/* <Bans
           pickbans={civPickBan}
           statutes={banTeam1(draftInfo)}
