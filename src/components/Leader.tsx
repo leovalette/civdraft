@@ -12,7 +12,8 @@ type LeaderOrMapProps = {
       | "banT1"
       | "banT2"
       | "autoban"
-      | "available";
+      | "available"
+      | undefined; // TODO
   };
   onClick?: () => void;
   type?: "leader" | "map";

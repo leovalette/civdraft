@@ -1,6 +1,6 @@
-import { v } from "convex/values";
-import type { Id } from "./_generated/dataModel";
-import { mutation, query } from "./_generated/server";
+import { v } from "convex/values"
+import type { Id } from "./_generated/dataModel"
+import { mutation, query } from "./_generated/server"
 
 export const create = mutation({
   args: {
@@ -25,6 +25,7 @@ export const create = mutation({
       numberOfPicksFirstRotation,
       numberOfPicksSecondRotation,
       mapIds,
+      mapDraft
     },
   ) => {
     const finalMapIds: Id<"maps">[] =
@@ -32,7 +33,7 @@ export const create = mutation({
       (await ctx.db
         .query("maps")
         .collect()
-        .then((maps) => maps.map((m) => m._id)));
+        .then((maps) => maps.map((m) => m._id)))
     return await ctx.db.insert("lobbies", {
       status: "LOBBY",
       team1: {
@@ -59,9 +60,16 @@ export const create = mutation({
       numberOfPicksSecondRotation: numberOfPicksSecondRotation ?? 4,
       mapIds: finalMapIds,
       bannedMapIds: [],
-    });
+      draftStatus: mapDraft ? {
+        type: "MAPBAN",
+        index: 1,
+      } : {
+        type: "BAN",
+        index: 1
+      },
+    })
   },
-});
+})
 
 export const joinObservers = mutation({
   args: {
@@ -70,13 +78,13 @@ export const joinObservers = mutation({
     playerId: v.string(),
   },
   handler: async (ctx, { lobbyId, playerPseudo, playerId }) => {
-    const lobby = await ctx.db.get(lobbyId);
+    const lobby = await ctx.db.get(lobbyId)
     if (!lobby) {
-      throw new Error("Lobby not found");
+      throw new Error("Lobby not found")
     }
 
     if (lobby.observers.find(({ id }) => id === playerId)) {
-      return;
+      return
     }
 
     await ctx.db.patch(lobbyId, {
@@ -89,9 +97,9 @@ export const joinObservers = mutation({
         players: lobby.team2.players.filter(({ id }) => id !== playerId),
       },
       observers: [...lobby.observers, { id: playerId, pseudo: playerPseudo }],
-    });
+    })
   },
-});
+})
 
 export const joinTeam1 = mutation({
   args: {
@@ -100,12 +108,12 @@ export const joinTeam1 = mutation({
     playerId: v.string(),
   },
   handler: async (ctx, { lobbyId, playerPseudo, playerId }) => {
-    const lobby = await ctx.db.get(lobbyId);
+    const lobby = await ctx.db.get(lobbyId)
     if (!lobby) {
-      throw new Error("Lobby not found");
+      throw new Error("Lobby not found")
     }
     if (lobby.team1.players.find(({ id }) => id === playerId)) {
-      return;
+      return
     }
     await ctx.db.patch(lobbyId, {
       team1: {
@@ -120,9 +128,9 @@ export const joinTeam1 = mutation({
         players: lobby.team2.players.filter(({ id }) => id !== playerId),
       },
       observers: lobby.observers.filter(({ id }) => id !== playerId),
-    });
+    })
   },
-});
+})
 
 export const joinTeam2 = mutation({
   args: {
@@ -131,12 +139,12 @@ export const joinTeam2 = mutation({
     playerId: v.string(),
   },
   handler: async (ctx, { lobbyId, playerPseudo, playerId }) => {
-    const lobby = await ctx.db.get(lobbyId);
+    const lobby = await ctx.db.get(lobbyId)
     if (!lobby) {
-      throw new Error("Lobby not found");
+      throw new Error("Lobby not found")
     }
     if (lobby.team2.players.find(({ id }) => id === playerId)) {
-      return;
+      return
     }
     await ctx.db.patch(lobbyId, {
       team2: {
@@ -151,9 +159,9 @@ export const joinTeam2 = mutation({
         players: lobby.team1.players.filter(({ id }) => id !== playerId),
       },
       observers: lobby.observers.filter(({ id }) => id !== playerId),
-    });
+    })
   },
-});
+})
 
 export const renamePlayer = mutation({
   args: {
@@ -162,9 +170,9 @@ export const renamePlayer = mutation({
     newPseudo: v.string(),
   },
   handler: async (ctx, { lobbyId, playerId, newPseudo }) => {
-    const lobby = await ctx.db.get(lobbyId);
+    const lobby = await ctx.db.get(lobbyId)
     if (!lobby) {
-      throw new Error("Lobby not found");
+      throw new Error("Lobby not found")
     }
 
     await ctx.db.patch(lobbyId, {
@@ -183,9 +191,9 @@ export const renamePlayer = mutation({
       observers: lobby.observers.map((p) =>
         p.id === playerId ? { ...p, pseudo: newPseudo } : p,
       ),
-    });
+    })
   },
-});
+})
 
 export const toggleTeamReady = mutation({
   args: {
@@ -193,19 +201,19 @@ export const toggleTeamReady = mutation({
     playerId: v.string(),
   },
   handler: async (ctx, { lobbyId, playerId }) => {
-    const lobby = await ctx.db.get(lobbyId);
+    const lobby = await ctx.db.get(lobbyId)
     if (!lobby) {
-      throw new Error("Lobby not found");
+      throw new Error("Lobby not found")
     }
 
     const isPlayerInTeam1 = lobby.team1.players.find(
       ({ id }) => id === playerId,
-    );
+    )
     const isPlayerInTeam2 = lobby.team2.players.find(
       ({ id }) => id === playerId,
-    );
+    )
     if (!isPlayerInTeam1 && !isPlayerInTeam2) {
-      throw new Error("Player not in any team");
+      throw new Error("Player not in any team")
     }
 
     await ctx.db.patch(lobbyId, {
@@ -215,15 +223,15 @@ export const toggleTeamReady = mutation({
       team2: isPlayerInTeam2
         ? { ...lobby.team2, isReady: !lobby.team2.isReady }
         : { ...lobby.team2 },
-    });
+    })
   },
-});
+})
 
 export const get = query({
   args: {
     lobbyId: v.id("lobbies"),
   },
   handler: async (ctx, { lobbyId }) => {
-    return await ctx.db.get(lobbyId);
+    return await ctx.db.get(lobbyId)
   },
-});
+})

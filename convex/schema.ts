@@ -1,5 +1,5 @@
-import { defineSchema, defineTable } from "convex/server";
-import { v } from "convex/values";
+import { defineSchema, defineTable } from "convex/server"
+import { v } from "convex/values"
 
 export default defineSchema({
   leaders: defineTable({
@@ -55,5 +55,9 @@ export default defineSchema({
     bannedMapIds: v.array(v.id("maps")),
     selectedMapId: v.optional(v.id("maps")),
     currentMapBanTeam: v.optional(v.union(v.literal(1), v.literal(2))),
+    draftStatus: v.object({
+      type: v.union(v.literal('PICK'), v.literal('BAN'), v.literal('MAPBAN')),
+      index: v.number(),
+    }),
   }),
-});
+})
