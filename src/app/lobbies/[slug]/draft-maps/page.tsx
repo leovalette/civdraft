@@ -1,14 +1,13 @@
 "use client"
 
 import { useMutation, useQuery } from "convex/react"
-import { X } from "lucide-react"
-import Image from "next/image"
+import router from "next/router"
 import { use, useEffect, useMemo, useState } from "react"
-import { CivPrimaryButton } from "@/components/CivPrimaryButton"
+import { DraftActions } from "@/components/DraftActions"
 import { LeaderOrMap } from "@/components/Leader"
 import { TeamHeaders } from "@/components/TeamHeaders"
 import { TeamSelection } from "@/components/TeamSelection"
-import { Button } from "@/components/ui/button"
+import { getUserId } from "@/lib/user"
 import { api } from "../../../../../convex/_generated/api"
 import type { Id } from "../../../../../convex/_generated/dataModel"
 
@@ -21,10 +20,11 @@ export default function DraftMapsPage({
   const lobby = useQuery(api.lobbies.get, { lobbyId })
   const allMaps = useQuery(api.maps.getAll)
   const banMap = useMutation(api.mapDraft.banMap)
+  const userId = getUserId()
 
   const [selectedMapId, setSelectedMapId] = useState<Id<"maps"> | null>(null)
 
-  const currentTeam = lobby?.currentMapBanTeam ?? 1
+  const currentTeam = useMemo(() => lobby?.currentMapBanTeam ?? 1, [lobby])
 
   const team1BannedMaps = useMemo(
     () => allMaps?.filter((map) => lobby?.team1.bannedMaps.includes(map._id)),
@@ -35,6 +35,19 @@ export default function DraftMapsPage({
     () => allMaps?.filter((map) => lobby?.team2.bannedMaps.includes(map._id)),
     [allMaps, lobby],
   )
+
+  const isObserver = useMemo(
+    () => lobby?.observers.some((observer) => observer.id === userId) ?? false,
+    [lobby],
+  )
+
+  const canPlay = useMemo(() => {
+    const isPlayerTeam1 =
+      lobby?.team1.players.some((player) => player.id === userId) ?? false
+    const isPlayerTeam2 =
+      lobby?.team2.players.some((player) => player.id === userId) ?? false
+    return (currentTeam === 1 ? isPlayerTeam1 : isPlayerTeam2) && !isObserver
+  }, [currentTeam, isObserver])
 
   const handleConfirm = async () => {
     if (!selectedMapId) return
@@ -61,12 +74,21 @@ export default function DraftMapsPage({
   }, [lobby, allMaps])
 
   const filteredMaps = useMemo(() => {
-    if (!lobby) return []
+    if (!lobby) {
+      return []
+    }
     return (
       availableMaps?.filter((map) => !lobby.bannedMapIds.includes(map._id)) ??
       []
     )
   }, [lobby, availableMaps])
+
+  useEffect(() => {
+    if (!lobby?.withMapDraft || filteredMaps.length <= 1) {
+      // Navigate to the lobby page
+      router.push(`/lobbies/${lobbyId}/draft-leaders`)
+    }
+  }, [filteredMaps])
 
   return (
     <div className="flex  h-screen w-full flex-col items-center justify-center gap-2 px-8 text-text-primary">
@@ -117,15 +139,7 @@ export default function DraftMapsPage({
               />
             ))}
           </div>
-          <div className="mt-4"          >
-            <CivPrimaryButton
-              disabled={!selectedMapId}
-              onClick={handleConfirm}
-            >
-              Confirm
-            </CivPrimaryButton>
-          </div>
-        </div>{" "}
+        </div>
         <div className="flex flex-col gap-6">
           <TeamSelection
             leaderOrMaps={
@@ -147,31 +161,14 @@ export default function DraftMapsPage({
         </div>
       </div>
       <div className="flex w-full items-center justify-between mt-4">
-        <CivPrimaryButton
-          disabled={!selectedMapId}
-          onClick={handleConfirm}
-        >
-          Confirm
-        </CivPrimaryButton>
-        {/* <Bans
-          pickbans={civPickBan}
-          statutes={banTeam1(draftInfo)}
-          currentStatus={draftInfo?.status}
-          groupBan={groupBan(draftInfo)}
-        />
-        <DraftActions
-          currentStatus={draftInfo?.status}
-          canPlay={canPlay}
-          currentPlayer={currentPlayer}
-          onPickBan={banLeader}
-        />
-        <Bans
-          pickbans={civPickBan}
-          statutes={banTeam2(draftInfo)}
-          currentStatus={draftInfo?.status}
-          isTeam2={true}
-          groupBan={groupBan(draftInfo)}
-        /> */}
+        {lobby && (
+          <DraftActions
+            currentStatus={`${lobby.draftStatus.type}${lobby.draftStatus.index}`}
+            canPlay={canPlay}
+            onPickBan={handleConfirm}
+            isObserver={isObserver}
+          />
+        )}
       </div>
     </div>
   )

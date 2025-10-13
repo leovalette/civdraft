@@ -4,7 +4,7 @@ import { animated, useSpring } from "react-spring"
 const getDraftStatus = (
   team1: string,
   team2: string,
-  currentStatus?: string // TODO
+  currentStatus: `${'PICK' | 'BAN' | 'MAPBAN'}${number}`
 ) => {
   if (!currentStatus) {
     return 'Waiting for players...'
@@ -15,10 +15,6 @@ const getDraftStatus = (
   if (currentStatus.startsWith('PICK')) {
     return Number(currentStatus.replace("PICK", "")) % 2 === 1 ? `${team1} is picking` : `${team2} is picking`
   }
-  if (currentStatus === "COMPLETED") {
-    return 'Draft over'
-  }
-
 }
 
 

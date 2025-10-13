@@ -86,6 +86,10 @@ export default function Home() {
     team2,
   ])
 
+  const isNumberOfMapsValid = useMemo(() => {
+    return selectedMaps.length % 2 === 1
+  }, [preset, presets, selectedMaps])
+
   return (
     <div className="w-96 flex flex-col gap-4 rounded-lg border border-golden-border bg-gradient-to-br from-indigo-200 p-6 text-bg-golden-border">
       <Input value={team1} setValue={setTeam1} label="Team 1 name" />
@@ -103,7 +107,10 @@ export default function Home() {
         maps={maps?.map(({ name, imageName }) => ({ name, src: imageName })) ?? []}
       />
       <div className="pt-6">
-        <CivPrimaryButton onClick={() => void onSubmit()}>Create Lobby</CivPrimaryButton>
+        <CivPrimaryButton disabled={!isNumberOfMapsValid} onClick={() => void onSubmit()}>Create Lobby</CivPrimaryButton>
+        {!isNumberOfMapsValid && <div className="text-lg font-semibold ">
+          Please select 3-5-7 maps
+        </div>}
       </div>
     </div>
   )

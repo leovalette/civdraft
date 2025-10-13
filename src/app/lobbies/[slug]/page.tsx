@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery } from "convex/react"
 import Image from "next/image"
+import router from "next/router"
 import { use, useCallback, useEffect, useMemo, useState } from "react"
 import { EditText, type onSaveProps } from "react-edit-text"
 import { Tooltip } from "react-tooltip"
@@ -143,6 +144,13 @@ export default function LobbyPage({
       )
     }
   }
+
+  useEffect(() => {
+    if (lobby?.team1.isReady && lobby.team2.isReady) {
+      // Navigate to the lobby page
+      lobby.withMapDraft ? router.push(`/lobbies/${lobbyId}/draft-maps`) : router.push(`/lobbies/${lobbyId}/draft-leaders`)
+    }
+  }, [lobby])
 
   return (
     <div className="flex h-screen w-10/12 flex-col text-white">
