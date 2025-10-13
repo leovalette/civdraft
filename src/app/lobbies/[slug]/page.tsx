@@ -1,32 +1,32 @@
-"use client"
+"use client";
 
-import { useMutation, useQuery } from "convex/react"
-import Image from "next/image"
-import router from "next/router"
-import { use, useCallback, useEffect, useMemo, useState } from "react"
-import { EditText, type onSaveProps } from "react-edit-text"
-import { Tooltip } from "react-tooltip"
-import { CivPrimaryButton } from "@/components/CivPrimaryButton"
-import { Button } from "@/components/ui/button"
-import { getUserId, getUserPseudo } from "@/lib/user"
-import { api } from "../../../../convex/_generated/api"
-import type { Id } from "../../../../convex/_generated/dataModel"
+import { useMutation, useQuery } from "convex/react";
+import Image from "next/image";
+import router from "next/router";
+import { use, useCallback, useEffect, useMemo, useState } from "react";
+import { EditText, type onSaveProps } from "react-edit-text";
+import { Tooltip } from "react-tooltip";
+import { CivPrimaryButton } from "@/components/CivPrimaryButton";
+import { Button } from "@/components/ui/button";
+import { getUserId, getUserPseudo } from "@/lib/user";
+import { api } from "../../../../convex/_generated/api";
+import type { Id } from "../../../../convex/_generated/dataModel";
 
 export default function LobbyPage({
   params,
 }: {
-  params: Promise<{ slug: Id<"lobbies"> }>
+  params: Promise<{ slug: Id<"lobbies"> }>;
 }) {
-  const { slug: lobbyId } = use(params)
-  const lobby = useQuery(api.lobbies.get, { lobbyId })
-  const leaders = useQuery(api.leaders.get)
-  const maps = useQuery(api.maps.getAll)
+  const { slug: lobbyId } = use(params);
+  const lobby = useQuery(api.lobbies.get, { lobbyId });
+  const leaders = useQuery(api.leaders.get);
+  const maps = useQuery(api.maps.getAll);
 
-  const joinObservers = useMutation(api.lobbies.joinObservers)
-  const joinTeam1 = useMutation(api.lobbies.joinTeam1)
-  const joinTeam2 = useMutation(api.lobbies.joinTeam2)
-  const toggleTeamReady = useMutation(api.lobbies.toggleTeamReady)
-  const renamePlayer = useMutation(api.lobbies.renamePlayer)
+  const joinObservers = useMutation(api.lobbies.joinObservers);
+  const joinTeam1 = useMutation(api.lobbies.joinTeam1);
+  const joinTeam2 = useMutation(api.lobbies.joinTeam2);
+  const toggleTeamReady = useMutation(api.lobbies.toggleTeamReady);
+  const renamePlayer = useMutation(api.lobbies.renamePlayer);
 
   const autobans = useMemo(
     () =>
@@ -37,7 +37,7 @@ export default function LobbyPage({
           src: `/leaders/${leader.imageName}`,
         })) ?? [],
     [leaders, lobby],
-  )
+  );
 
   const mapsToDraft = useMemo(
     () =>
@@ -46,10 +46,10 @@ export default function LobbyPage({
         src: `/maps/${map.imageName}`,
       })) ?? [],
     [maps],
-  )
+  );
 
-  const [userPseudo, setUserPseudo] = useState("")
-  const [userId, setUserId] = useState("")
+  const [userPseudo, setUserPseudo] = useState("");
+  const [userId, setUserId] = useState("");
 
   const handleJoinTeam1 = useCallback(() => {
     if (userId && userPseudo) {
@@ -57,9 +57,9 @@ export default function LobbyPage({
         lobbyId,
         playerPseudo: userPseudo,
         playerId: userId,
-      })
+      });
     }
-  }, [userId, userPseudo, lobbyId, joinTeam1])
+  }, [userId, userPseudo, lobbyId, joinTeam1]);
 
   const handleJoinTeam2 = useCallback(() => {
     if (userId && userPseudo) {
@@ -67,9 +67,9 @@ export default function LobbyPage({
         lobbyId,
         playerPseudo: userPseudo,
         playerId: userId,
-      })
+      });
     }
-  }, [userId, userPseudo, lobbyId, joinTeam2])
+  }, [userId, userPseudo, lobbyId, joinTeam2]);
 
   const handleJoinObservers = useCallback(() => {
     if (userId && userPseudo) {
@@ -77,47 +77,47 @@ export default function LobbyPage({
         lobbyId,
         playerPseudo: userPseudo,
         playerId: userId,
-      })
+      });
     }
-  }, [userId, userPseudo, lobbyId, joinObservers])
+  }, [userId, userPseudo, lobbyId, joinObservers]);
 
   const handleToggleReady = useCallback(() => {
     if (userId) {
       toggleTeamReady({
         lobbyId,
         playerId: userId,
-      })
+      });
     }
-  }, [userId, lobbyId, toggleTeamReady])
+  }, [userId, lobbyId, toggleTeamReady]);
 
   useEffect(() => {
     // Get or generate user identification on mount
-    const pseudo = getUserPseudo()
-    const id = getUserId()
-    setUserPseudo(pseudo)
-    setUserId(id)
+    const pseudo = getUserPseudo();
+    const id = getUserId();
+    setUserPseudo(pseudo);
+    setUserId(id);
     joinObservers({
       lobbyId,
       playerPseudo: pseudo,
       playerId: id,
-    })
-  }, [joinObservers, lobbyId])
+    });
+  }, [joinObservers, lobbyId]);
 
   const getUrl = async () => {
-    const url = window.location.href
-    await navigator.clipboard.writeText(url)
-  }
+    const url = window.location.href;
+    await navigator.clipboard.writeText(url);
+  };
 
   const onRenamePlayer = useCallback(
     ({ value }: onSaveProps) => {
       if (!lobby) {
-        return
+        return;
       }
-      setUserPseudo(value)
-      renamePlayer({ lobbyId: lobby._id, playerId: userId, newPseudo: value })
+      setUserPseudo(value);
+      renamePlayer({ lobbyId: lobby._id, playerId: userId, newPseudo: value });
     },
     [lobby, renamePlayer, userId],
-  )
+  );
 
   const showPlayerPseudo = (player: { id: string; pseudo: string }) => {
     if (player.id === userId) {
@@ -135,22 +135,24 @@ export default function LobbyPage({
             onSave={onRenamePlayer}
           />
         </div>
-      )
+      );
     } else {
       return (
         <div key={player.id} className="border-b border-border p-4">
           {player.pseudo}
         </div>
-      )
+      );
     }
-  }
+  };
 
   useEffect(() => {
     if (lobby?.team1.isReady && lobby.team2.isReady) {
       // Navigate to the lobby page
-      lobby.withMapDraft ? router.push(`/lobbies/${lobbyId}/draft-maps`) : router.push(`/lobbies/${lobbyId}/draft-leaders`)
+      lobby.withMapDraft
+        ? router.push(`/lobbies/${lobbyId}/draft-maps`)
+        : router.push(`/lobbies/${lobbyId}/draft-leaders`);
     }
-  }, [lobby])
+  }, [lobby]);
 
   return (
     <div className="flex h-screen w-10/12 flex-col text-white">
@@ -273,5 +275,5 @@ export default function LobbyPage({
         )}
       </div>
     </div>
-  )
+  );
 }
