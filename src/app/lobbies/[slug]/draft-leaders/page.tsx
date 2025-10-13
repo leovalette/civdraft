@@ -3,6 +3,7 @@
 import { useMutation, useQuery } from "convex/react";
 import router from "next/router";
 import { use, useEffect, useMemo, useState } from "react";
+import { Bans } from "@/components/bans/Bans";
 import { DraftActions } from "@/components/DraftActions";
 import { LeaderOrMap } from "@/components/Leader";
 import { TeamHeaders } from "@/components/TeamHeaders";
@@ -18,23 +19,37 @@ export default function DraftMapsPage({
 }) {
 	const { slug: lobbyId } = use(params);
 	const lobby = useQuery(api.lobbies.get, { lobbyId });
-	const allMaps = useQuery(api.maps.getAll);
-	const banMap = useMutation(api.mapDraft.banMap);
-	const userId = getUserId();
+	const leaders = useQuery(api.leaders.get);
+	const banLeader = useMutation(api.leaders.banLeader);
 
-	const [selectedMapId, setSelectedMapId] = useState<Id<"maps"> | null>(null);
+	const userId = getUserId();
+	const [selectedLeaderId, setSelectedLeaderId] =
+		useState<Id<"leaders"> | null>(null);
+
+	const team1SelectedLeaders = useMemo(
+		() =>
+			leaders?.filter((leader) =>
+				lobby?.team1.selectedLeaders.includes(leader._id),
+			) ?? [],
+		[leaders, lobby],
+	);
+
+	const team2SelectedLeaders = useMemo(
+		() =>
+			leaders?.filter((leader) =>
+				lobby?.team2.selectedLeaders.includes(leader._id),
+			) ?? [],
+		[leaders, lobby],
+	);
+
+	const numberOfPicks = useMemo(() => {
+		if (!lobby) {
+			return 0;
+		}
+		return lobby.numberOfPicksFirstRotation + lobby.numberOfPicksSecondRotation;
+	}, [lobby]);
 
 	const currentTeam = useMemo(() => lobby?.currentTeamTurn ?? 1, [lobby]);
-
-	const team1BannedMaps = useMemo(
-		() => allMaps?.filter((map) => lobby?.team1.bannedMaps.includes(map._id)),
-		[allMaps, lobby],
-	);
-
-	const team2BannedMaps = useMemo(
-		() => allMaps?.filter((map) => lobby?.team2.bannedMaps.includes(map._id)),
-		[allMaps, lobby],
-	);
 
 	const isObserver = useMemo(
 		() => lobby?.observers.some((observer) => observer.id === userId) ?? false,
@@ -49,46 +64,42 @@ export default function DraftMapsPage({
 		return (currentTeam === 1 ? isPlayerTeam1 : isPlayerTeam2) && !isObserver;
 	}, [currentTeam, isObserver]);
 
+	const filteredLeaders = useMemo(
+		() =>
+			leaders?.filter(
+				(leader) =>
+					!lobby?.team1.selectedLeaders.includes(leader._id) &&
+					!lobby?.team2.selectedLeaders.includes(leader._id) &&
+					leader.name !== "TIMEOUT",
+			) ?? [],
+		[leaders, lobby],
+	);
+
 	const handleConfirm = async () => {
-		if (!selectedMapId) return;
+		if (!selectedLeaderId) return;
 
 		try {
-			await banMap({
+			await banLeader({
 				lobbyId,
-				mapId: selectedMapId,
+				leaderId: selectedLeaderId,
 				teamNumber: currentTeam,
 			});
-			setSelectedMapId(null);
+			setSelectedLeaderId(null);
 		} catch (error) {
-			console.error("Error banning map:", error);
+			console.error("Error banning leader:", error);
 		}
 	};
 
-	const availableMaps = useMemo(() => {
-		if (!lobby || !allMaps) {
-			return [];
-		}
-		return lobby.bannedMapIds.length === 0
-			? allMaps
-			: allMaps.filter((map) => lobby.mapIds.includes(map._id));
-	}, [lobby, allMaps]);
-
-	const filteredMaps = useMemo(() => {
-		if (!lobby) {
-			return [];
-		}
-		return (
-			availableMaps?.filter((map) => !lobby.bannedMapIds.includes(map._id)) ??
-			[]
-		);
-	}, [lobby, availableMaps]);
-
 	useEffect(() => {
-		if (!lobby?.withMapDraft || filteredMaps.length <= 1) {
+		if (
+			lobby?.draftStatus.type === "PICK" &&
+			lobby.draftStatus.index >
+				lobby.numberOfPicksFirstRotation + lobby.numberOfPicksSecondRotation
+		) {
 			// Navigate to the lobby page
-			router.push(`/lobbies/${lobbyId}/draft-leaders`);
+			router.push(`/lobbies/${lobbyId}/completed-leaders`);
 		}
-	}, [filteredMaps]);
+	}, [lobby]);
 
 	return (
 		<div className="flex  h-screen w-full flex-col items-center justify-center gap-2 px-8 text-text-primary">
@@ -106,23 +117,16 @@ export default function DraftMapsPage({
 					{lobby && (
 						<TeamSelection
 							leaderOrMaps={
-								team1BannedMaps?.map((map) => ({
-									id: map._id,
-									name: map.name,
-									imageName: map.imageName,
-									type: "map",
+								team1SelectedLeaders.map((leader) => ({
+									id: leader._id,
+									name: leader.name,
+									imageName: leader.imageName,
+									type: "leader",
 								})) ?? []
 							}
-							numberOfPicks={availableMaps.length / 2}
+							numberOfPicks={numberOfPicks / 2}
 							currentStatus={`${lobby.draftStatus.type}${lobby.draftStatus.index}`}
-							statuses={[
-								"MAPBAN1",
-								"MAPBAN3",
-								"MAPBAN5",
-								"MAPBAN7",
-								"MAPBAN9",
-								"MAPBAN11",
-							]}
+							statuses={["PICK1", "PICK4", "PICK6", "PICK7"]}
 						/>
 					)}
 				</div>
@@ -136,17 +140,23 @@ export default function DraftMapsPage({
 						</div>
 					</div>
 					<div className="flex h-4/5 flex-wrap justify-center gap-4 overflow-y-scroll">
-						{filteredMaps.map((map) => (
+						{filteredLeaders.map((leader) => (
 							<LeaderOrMap
-								key={map._id}
+								key={leader._id}
 								leaderOrMap={{
-									id: map._id,
-									name: map.name,
-									imageName: map.imageName,
-									pickBanType: undefined, // TODO
+									id: leader._id,
+									name: leader.name,
+									imageName: leader.imageName,
+									pickBanType: lobby?.team1.bannedLeaders.includes(leader._id)
+										? "BANT1"
+										: lobby?.team2.bannedLeaders.includes(leader._id)
+											? "BANT2"
+											: lobby?.autoBannedLeaderIds.includes(leader._id)
+												? "AUTOBAN"
+												: "available",
 								}}
-								type="map"
-								onClick={() => setSelectedMapId(map._id)}
+								type="leader"
+								onClick={() => setSelectedLeaderId(leader._id)}
 							/>
 						))}
 					</div>
@@ -155,23 +165,16 @@ export default function DraftMapsPage({
 					{lobby && (
 						<TeamSelection
 							leaderOrMaps={
-								team2BannedMaps?.map((map) => ({
-									id: map._id,
-									name: map.name,
-									imageName: map.imageName,
-									type: "map",
+								team2SelectedLeaders.map((leader) => ({
+									id: leader._id,
+									name: leader.name,
+									imageName: leader.imageName,
+									type: "leader",
 								})) ?? []
 							}
-							numberOfPicks={availableMaps.length / 2}
+							numberOfPicks={numberOfPicks / 2}
 							currentStatus={`${lobby.draftStatus.type}${lobby.draftStatus.index}`}
-							statuses={[
-								"MAPBAN2",
-								"MAPBAN4",
-								"MAPBAN6",
-								"MAPBAN8",
-								"MAPBAN10",
-								"MAPBAN12",
-							]}
+							statuses={["PICK2", "PICK3", "PICK5", "PICK8"]}
 						/>
 					)}
 					{/* <Chat
@@ -184,12 +187,16 @@ export default function DraftMapsPage({
 			</div>
 			<div className="flex w-full items-center justify-between mt-4">
 				{lobby && (
-					<DraftActions
-						currentStatus={`${lobby.draftStatus.type}${lobby.draftStatus.index}`}
-						canPlay={canPlay}
-						onPickBan={handleConfirm}
-						isObserver={isObserver}
-					/>
+					<>
+						<Bans numberOfBans={0} bans={[]} />
+						<DraftActions
+							currentStatus={`${lobby.draftStatus.type}${lobby.draftStatus.index}`}
+							canPlay={canPlay}
+							onPickBan={handleConfirm}
+							isObserver={isObserver}
+						/>
+						<Bans numberOfBans={0} bans={[]} />
+					</>
 				)}
 			</div>
 		</div>

@@ -7,11 +7,11 @@ type LeaderOrMapProps = {
     name: string;
     imageName: string;
     pickBanType:
-      | "pickT1"
-      | "pickT2"
-      | "banT1"
-      | "banT2"
-      | "autoban"
+      | "PICKT1"
+      | "PICKT2"
+      | "BANT1"
+      | "BANT2"
+      | "AUTOBAN"
       | "available"
       | undefined; // TODO
   };
@@ -25,22 +25,22 @@ export const LeaderOrMap = ({
   type = "leader",
 }: LeaderOrMapProps) => {
   const background =
-    leaderOrMap.pickBanType === "pickT1"
+    leaderOrMap.pickBanType === "PICKT1"
       ? "bg-team1"
-      : leaderOrMap.pickBanType === "pickT2"
+      : leaderOrMap.pickBanType === "PICKT2"
         ? "bg-team2"
-        : leaderOrMap.pickBanType === "banT1"
+        : leaderOrMap.pickBanType === "BANT1"
           ? "bg-team1"
-          : leaderOrMap.pickBanType === "banT2"
+          : leaderOrMap.pickBanType === "BANT2"
             ? "bg-team2"
-            : leaderOrMap.pickBanType === "autoban"
+            : leaderOrMap.pickBanType === "AUTOBAN"
               ? "bg-[#000000]"
               : "bg-background-dark";
 
   const crossed =
-    leaderOrMap.pickBanType === "banT1" ||
-    leaderOrMap.pickBanType === "banT2" ||
-    leaderOrMap.pickBanType === "autoban"
+    leaderOrMap.pickBanType === "BANT1" ||
+    leaderOrMap.pickBanType === "BANT2" ||
+    leaderOrMap.pickBanType === "AUTOBAN"
       ? "cross-container"
       : "";
   const cursor =

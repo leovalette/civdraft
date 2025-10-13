@@ -13,7 +13,7 @@ export const startMapDraft = mutation({
 
     await ctx.db.patch(lobbyId, {
       status: "MAP_SELECTION",
-      currentMapBanTeam: 1,
+      currentTeamTurn: 1,
     });
   },
 });
@@ -58,7 +58,11 @@ export const banMap = mutation({
         ...lobby.team2,
         bannedMaps: team2BannedMaps,
       },
-      currentMapBanTeam: nextTeam,
+      currentTeamTurn: nextTeam,
+      draftStatus: {
+        type: "MAPBAN",
+        index: lobby.draftStatus.index + 1,
+      },
     });
   },
 });
