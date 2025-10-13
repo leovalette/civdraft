@@ -128,9 +128,6 @@ export default function DraftMapsPage({
         </div>
         <div className="flex-1">
           <div className="flex items-center">
-            <div className="w-96">
-              {/* TODO: <Search value={search} setValue={setSearch} /> */}
-            </div>
             <div className="flex justify-between gap-6 sm:scale-75 md:scale-75 lg:scale-75">
               {/* TODO <Timer timestamp={timestamp} timerDuration={60} /> */}
             </div>

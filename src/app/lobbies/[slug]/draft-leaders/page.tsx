@@ -7,6 +7,7 @@ import { use, useEffect, useMemo, useState } from "react";
 import { Bans } from "@/components/bans/Bans";
 import { DraftActions } from "@/components/DraftActions";
 import { LeaderOrMap } from "@/components/Leader";
+import { Search } from "@/components/Search";
 import { TeamHeaders } from "@/components/TeamHeaders";
 import { TeamSelection } from "@/components/TeamSelection";
 import { getUserId } from "@/lib/user";
@@ -27,6 +28,7 @@ export default function DraftMapsPage({
   const userId = getUserId();
   const [selectedLeaderId, setSelectedLeaderId] =
     useState<Id<"leaders"> | null>(null);
+  const [search, setSearch] = useState<string>("");
 
   const team1SelectedLeaders = useMemo(
     () =>
@@ -72,9 +74,13 @@ export default function DraftMapsPage({
         (leader) =>
           !lobby?.team1.selectedLeaders.includes(leader._id) &&
           !lobby?.team2.selectedLeaders.includes(leader._id) &&
+          leader.name
+            .toLowerCase()
+            .trim()
+            .includes(search.toLowerCase().trim()) &&
           leader.name !== "TIMEOUT",
       ) ?? [],
-    [leaders, lobby],
+    [leaders, lobby, search],
   );
 
   const selectedMap = useMemo(
@@ -149,7 +155,7 @@ export default function DraftMapsPage({
         <div className="flex-1">
           <div className="flex items-center">
             <div className="w-96">
-              {/* TODO: <Search value={search} setValue={setSearch} /> */}
+              <Search value={search} setValue={setSearch} />
             </div>
             <div className="flex justify-between gap-6 sm:scale-75 md:scale-75 lg:scale-75">
               {/* TODO <Timer timestamp={timestamp} timerDuration={60} /> */}
