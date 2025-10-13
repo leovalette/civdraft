@@ -260,7 +260,7 @@ export default function LobbyPage({
               {mapsToDraft.map((map) => (
                 <Image
                   key={map.name}
-                  src={map.src}
+                  src={`maps/${map.src}`}
                   className="h-12 w-12"
                   alt="map-image"
                   data-tooltip-id={map.name}

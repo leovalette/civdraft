@@ -59,7 +59,7 @@ export const LeaderOrMap = ({
       >
         <Image
           className="flex h-28 w-28 items-center justify-center rounded-xl text-center sm:h-12 sm:w-12 md:h-16 md:w-16 lg:h-20 lg:w-20 xl:h-28 xl:w-28"
-          src={`../../public/${type === "leader" ? "leaders" : "maps"}/${leaderOrMap.imageName}`}
+          src={`/${type === "leader" ? "leaders" : "maps"}/${leaderOrMap.imageName}`}
           alt={leaderOrMap.name}
           onClick={clickOrNotToClick}
         />
