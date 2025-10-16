@@ -26,13 +26,13 @@ export const Chat = ({ messages, postMessage }: ChatProps) => {
   return (
     <div>
       <ul
-        className="message-list w-80 sm:w-40 md:w-60 lg:w-60 xl:w-80"
+        className="bg-[#113b5c] overflow-auto h-[100px] w-80 sm:w-40 md:w-60 lg:w-60 xl:w-80"
         ref={chatRef}
       >
         {messages.map((message) => {
           return (
             <li key={message.message}>
-              <div className="message-body">
+              <div className="box-border flex w-full bg-[#113b5c] px-2.5 py-0 text-[#7696ae]">
                 {message.pseudo}: {message.message}
               </div>
             </li>
@@ -42,11 +42,11 @@ export const Chat = ({ messages, postMessage }: ChatProps) => {
 
       <form onSubmit={handleSubmit}>
         <input
-          className="message-body w-80 sm:w-40 md:w-60 lg:w-60 xl:w-80"
+          className="box-border flex w-full bg-[#113b5c] px-2.5 py-0 text-[#7696ae] w-80 sm:w-40 md:w-60 lg:w-60 xl:w-80"
           type="text"
           placeholder="Your message"
         />
-        <input type="submit" value="Send" />
+        <input type="submit" value="Send" className="bg-[#113b5c] text-white px-5 py-3 m-[3px] border-0 rounded cursor-pointer" />
       </form>
     </div>
   );
