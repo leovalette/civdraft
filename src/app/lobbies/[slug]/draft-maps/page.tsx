@@ -24,23 +24,40 @@ export default function DraftMapsPage({
   const banMap = useMutation(api.mapDraft.banMap);
   const chat = useQuery(api.chat.get, { lobbyId });
   const postMessage = useMutation(api.chat.post);
+  const selectedMapId = useQuery(api.currentSelection.get, { lobbyId });
+  const setSelectedMapId = useMutation(api.currentSelection.set);
+  const clearSelectedMapId = useMutation(api.currentSelection.clear);
 
   const userId = getUserId();
   const pseudo = getUserPseudo();
 
-  const [selectedMapId, setSelectedMapId] = useState<Id<"maps"> | null>(null);
-
   const currentTeam = useMemo(() => lobby?.currentTeamTurn ?? 1, [lobby]);
 
-  const team1BannedMaps = useMemo(
-    () => allMaps?.filter((map) => lobby?.team1.bannedMaps.includes(map._id)),
-    [allMaps, lobby],
-  );
+  const team1BannedMaps = useMemo(() => {
+    if (!lobby || !allMaps) {
+      return [];
+    }
+    return lobby.currentTeamTurn === 1
+      ? allMaps.filter(
+          (map) =>
+            lobby.team1.bannedMaps.includes(map._id) ||
+            map._id === selectedMapId,
+        )
+      : allMaps.filter((map) => lobby.team1.bannedMaps.includes(map._id));
+  }, [allMaps, lobby]);
 
-  const team2BannedMaps = useMemo(
-    () => allMaps?.filter((map) => lobby?.team2.bannedMaps.includes(map._id)),
-    [allMaps, lobby],
-  );
+  const team2BannedMaps = useMemo(() => {
+    if (!lobby || !allMaps) {
+      return [];
+    }
+    return lobby.currentTeamTurn === 2
+      ? allMaps.filter(
+          (map) =>
+            lobby.team2.bannedMaps.includes(map._id) ||
+            map._id === selectedMapId,
+        )
+      : allMaps.filter((map) => lobby.team2.bannedMaps.includes(map._id));
+  }, [allMaps, lobby]);
 
   const isObserver = useMemo(
     () => lobby?.observers.some((observer) => observer.id === userId) ?? false,
@@ -61,10 +78,10 @@ export default function DraftMapsPage({
     try {
       await banMap({
         lobbyId,
-        mapId: selectedMapId,
+        mapId: selectedMapId as Id<"maps">,
         teamNumber: currentTeam,
       });
-      setSelectedMapId(null);
+      clearSelectedMapId({ lobbyId });
     } catch (error) {
       console.error("Error banning map:", error);
     }
@@ -159,7 +176,9 @@ export default function DraftMapsPage({
                   pickBanType: "AVAILABLE",
                 }}
                 type="map"
-                onClick={() => setSelectedMapId(map._id)}
+                onClick={() =>
+                  setSelectedMapId({ lobbyId, selectionId: map._id })
+                }
               />
             ))}
           </div>
@@ -197,6 +216,7 @@ export default function DraftMapsPage({
             canPlay={canPlay}
             onPickBan={handleConfirm}
             isObserver={isObserver}
+            disabled={!selectedMapId}
           />
         )}
       </div>

@@ -46,7 +46,11 @@ export const Chat = ({ messages, postMessage }: ChatProps) => {
           type="text"
           placeholder="Your message"
         />
-        <input type="submit" value="Send" className="bg-[#113b5c] text-white px-5 py-3 m-[3px] border-0 rounded cursor-pointer" />
+        <input
+          type="submit"
+          value="Send"
+          className="bg-[#113b5c] text-white px-5 py-3 m-[3px] border-0 rounded cursor-pointer"
+        />
       </form>
     </div>
   );

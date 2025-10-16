@@ -4,9 +4,15 @@ type BansProps = {
   numberOfBans: number;
   bans: { src: string; name: string }[];
   isTeam2?: boolean;
+  draftStatus: { type: "PICK" | "BAN" | "MAPBAN"; index: number };
 };
 
-export const Bans = ({ bans, numberOfBans, isTeam2 }: BansProps) => {
+export const Bans = ({
+  bans,
+  numberOfBans,
+  isTeam2,
+  draftStatus,
+}: BansProps) => {
   const normalizedBans = Array.from(
     { length: numberOfBans },
     (_, index) => bans[index] ?? undefined,
@@ -20,7 +26,16 @@ export const Bans = ({ bans, numberOfBans, isTeam2 }: BansProps) => {
             key={index}
             className={`flex gap-1 ${isTeam2 ? "flex-row-reverse" : ""}`}
           >
-            <Ban leader={ban} currentBan={false} />
+            <Ban
+              leader={ban}
+              currentBan={
+                draftStatus.type !== "BAN"
+                  ? false
+                  : isTeam2
+                    ? index === (draftStatus.index - 2) / 2
+                    : index === (draftStatus.index - 1) / 2
+              }
+            />
           </div>
         );
       })}

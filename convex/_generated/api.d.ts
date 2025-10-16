@@ -14,6 +14,7 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as chat from "../chat.js";
+import type * as currentSelection from "../currentSelection.js";
 import type * as leaders from "../leaders.js";
 import type * as lobbies from "../lobbies.js";
 import type * as mapDraft from "../mapDraft.js";
@@ -30,6 +31,7 @@ import type * as presets from "../presets.js";
  */
 declare const fullApi: ApiFromModules<{
   chat: typeof chat;
+  currentSelection: typeof currentSelection;
   leaders: typeof leaders;
   lobbies: typeof lobbies;
   mapDraft: typeof mapDraft;

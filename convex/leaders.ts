@@ -1,79 +1,100 @@
-import { v } from "convex/values"
-import { mutation, query, internalMutation } from "./_generated/server"
-import { internal } from "./_generated/api"
+import { v } from "convex/values";
+import { mutation, query, internalMutation } from "./_generated/server";
+import { internal } from "./_generated/api";
 
-const LEADER_BAN_TIMEOUT_MS = 60 * 1000 // 1 minute
-const DEFAULT_AUTO_BAN_LEADER_ID = "jd7envq8gzesxynzex5pjvcx0d7s2x2"
+const LEADER_BAN_TIMEOUT_MS = 60 * 1000; // 1 minute
+const DEFAULT_AUTO_BAN_LEADER_ID = "jd7envq8gzesxynzex5pjvcx0d7s2x2";
 
 export const get = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("leaders").collect()
+    return await ctx.db.query("leaders").collect();
   },
-})
+});
 
-export const banLeader = mutation({
+export const pickBanLeader = mutation({
   args: {
     lobbyId: v.id("lobbies"),
     leaderId: v.id("leaders"),
     teamNumber: v.union(v.literal(1), v.literal(2)),
   },
   handler: async (ctx, { lobbyId, leaderId, teamNumber }) => {
-    await performLeaderBan(ctx, lobbyId, leaderId, teamNumber)
+    await performLeaderPickBan(ctx, lobbyId, leaderId, teamNumber);
   },
-})
+});
 
-async function performLeaderBan(
+async function performLeaderPickBan(
   ctx: any,
   lobbyId: string,
   leaderId: string,
   teamNumber: 1 | 2,
 ) {
-  const lobby = await ctx.db.get(lobbyId)
+  const lobby = await ctx.db.get(lobbyId);
   if (!lobby) {
-    throw new Error("Lobby not found")
+    throw new Error("Lobby not found");
+  }
+
+  if (lobby.status !== "LEADER_SELECTION") {
+    return;
   }
 
   const team1BannedLeaders =
-    teamNumber === 1
+    lobby.draftStatus.type === "BAN" && teamNumber === 1
       ? [...lobby.team1.bannedLeaders, leaderId]
-      : lobby.team1.bannedLeaders
+      : lobby.team1.bannedLeaders;
   const team2BannedLeaders =
-    teamNumber === 2
+    lobby.draftStatus.type === "BAN" && teamNumber === 2
       ? [...lobby.team2.bannedLeaders, leaderId]
-      : lobby.team2.bannedLeaders
+      : lobby.team2.bannedLeaders;
+
+  const team1SelectedLeaders =
+    lobby.draftStatus.type === "PICK" && teamNumber === 1
+      ? [...lobby.team1.selectedLeaders, leaderId]
+      : lobby.team1.selectedLeaders;
+  const team2SelectedLeaders =
+    lobby.draftStatus.type === "PICK" && teamNumber === 2
+      ? [...lobby.team2.selectedLeaders, leaderId]
+      : lobby.team2.selectedLeaders;
 
   const isLastPick =
-    lobby.team1.selectedLeaders.length +
-    lobby.team2.selectedLeaders.length ===
-    lobby.numberOfPicksFirstRotation + lobby.numberOfPicksSecondRotation
+    team1SelectedLeaders.length + team2SelectedLeaders.length ===
+    lobby.numberOfPicksFirstRotation + lobby.numberOfPicksSecondRotation;
 
-  const now = Date.now()
+  const nextDraftStatus = getNextDraftStatus(
+    lobby.draftStatus,
+    lobby.numberOfBansFirstRotation,
+    lobby.numberOfBansSecondRotation,
+    lobby.numberOfPicksFirstRotation,
+  );
+
+  const now = Date.now();
   await ctx.db.patch(lobbyId, {
     team1: {
       ...lobby.team1,
       bannedLeaders: team1BannedLeaders,
+      selectedLeaders: team1SelectedLeaders,
     },
     team2: {
       ...lobby.team2,
       bannedLeaders: team2BannedLeaders,
+      selectedLeaders: team2SelectedLeaders,
     },
-    draftStatus: getNextDraftStatus(
-      lobby.draftStatus,
-      lobby.numberOfBansFirstRotation,
-      lobby.numberOfBansSecondRotation,
-      lobby.numberOfPicksFirstRotation,
-    ),
+    draftStatus: nextDraftStatus,
     status: isLastPick ? "COMPLETED" : "LEADER_SELECTION",
     leaderBanTimestamp: now,
-  })
+    currentTeamTurn: getCurrentTeamTurn(nextDraftStatus),
+  });
 
   // If not the last pick, schedule the next timeout check
   if (!isLastPick) {
-    await ctx.scheduler.runAfter(LEADER_BAN_TIMEOUT_MS, internal.leaders.checkLeaderBanTimeout, {
-      lobbyId,
-      timestampAtStart: now,
-    })
+    await ctx.scheduler.runAfter(
+      LEADER_BAN_TIMEOUT_MS,
+      internal.leaders.checkLeaderBanTimeout,
+      {
+        lobbyId,
+        timestampAtStart: now,
+      },
+    );
   }
 }
 
@@ -85,25 +106,25 @@ const getNextDraftStatus = (
 ): { type: "PICK" | "BAN" | "MAPBAN"; index: number } => {
   const isLastFirstRotaBan =
     currentStatus.type === "BAN" &&
-    currentStatus.index + 1 === numberOfBansFirstRotation
+    currentStatus.index === numberOfBansFirstRotation;
   const isLastSecondRotaBan =
     currentStatus.type === "BAN" &&
-    currentStatus.index + 1 ===
-    numberOfBansSecondRotation + numberOfBansFirstRotation
+    currentStatus.index ===
+      numberOfBansSecondRotation + numberOfBansFirstRotation;
   const isLastFirstRotaPick =
     currentStatus.type === "PICK" &&
-    currentStatus.index + 1 === numberOfPicksFirstRotation
+    currentStatus.index === numberOfPicksFirstRotation;
   if (isLastFirstRotaBan) {
-    return { type: "PICK", index: 1 }
+    return { type: "PICK", index: 1 };
   }
   if (isLastSecondRotaBan) {
-    return { type: "PICK", index: numberOfPicksFirstRotation + 1 }
+    return { type: "PICK", index: numberOfPicksFirstRotation + 1 };
   }
   if (isLastFirstRotaPick) {
-    return { type: "BAN", index: numberOfBansFirstRotation + 1 }
+    return { type: "BAN", index: numberOfBansFirstRotation + 1 };
   }
-  return { type: currentStatus.type, index: currentStatus.index + 1 }
-}
+  return { type: currentStatus.type, index: currentStatus.index + 1 };
+};
 
 export const checkLeaderBanTimeout = internalMutation({
   args: {
@@ -111,9 +132,9 @@ export const checkLeaderBanTimeout = internalMutation({
     timestampAtStart: v.number(),
   },
   handler: async (ctx, { lobbyId, timestampAtStart }) => {
-    const lobby = await ctx.db.get(lobbyId)
+    const lobby = await ctx.db.get(lobbyId);
     if (!lobby) {
-      return // Lobby was deleted
+      return; // Lobby was deleted
     }
 
     // Check if the lobby is still in LEADER_SELECTION and the timestamp hasn't changed
@@ -123,27 +144,28 @@ export const checkLeaderBanTimeout = internalMutation({
       lobby.leaderBanTimestamp === undefined ||
       lobby.leaderBanTimestamp !== timestampAtStart
     ) {
-      return // A ban was made or status changed, do nothing
+      return; // A ban was made or status changed, do nothing
     }
 
     // Auto-ban the default leader
-    await performLeaderBan(
+    await performLeaderPickBan(
       ctx,
       lobbyId,
       DEFAULT_AUTO_BAN_LEADER_ID,
       getCurrentTeamTurn(lobby.draftStatus),
-    )
+    );
   },
-})
+});
 
 // Helper function to determine which team's turn it is
-const getCurrentTeamTurn = (
-  draftStatus: { type: "PICK" | "BAN" | "MAPBAN"; index: number },
-): 1 | 2 => {
+const getCurrentTeamTurn = (draftStatus: {
+  type: "PICK" | "BAN" | "MAPBAN";
+  index: number;
+}): 1 | 2 => {
   if (draftStatus.type === "PICK") {
-    return [1, 4, 6, 7].includes(draftStatus.index) ? 1 : 2
+    return [1, 4, 6, 7].includes(draftStatus.index) ? 1 : 2;
   }
   // In the draft system, odd bans/picks are team 1, even are team 2
   // Adjust this logic based on your specific draft rules
-  return draftStatus.index % 2 === 1 ? 1 : 2
-}
+  return draftStatus.index % 2 === 1 ? 1 : 2;
+};

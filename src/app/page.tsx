@@ -61,7 +61,6 @@ export default function Home() {
   }, []);
 
   const onSubmit = useCallback(async () => {
-    console.log({ selectedMaps });
     // Find the selected preset to get all required data
     const selectedPreset = presets?.find((m) => m._id === preset?.id);
 
