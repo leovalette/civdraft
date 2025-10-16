@@ -11,7 +11,7 @@ import { getUserId, getUserPseudo } from "@/lib/user";
 import { api } from "../../../../../convex/_generated/api";
 import type { Id } from "../../../../../convex/_generated/dataModel";
 import { Chat } from "@/components/chat/Chat";
-import { Timer } from "@/components/Timer"
+import { Timer } from "@/components/Timer";
 
 export default function DraftMapsPage({
   params,

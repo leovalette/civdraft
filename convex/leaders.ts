@@ -3,7 +3,7 @@ import { mutation, query, internalMutation } from "./_generated/server";
 import { internal } from "./_generated/api";
 
 const LEADER_BAN_TIMEOUT_MS = 60 * 1000; // 1 minute
-const DEFAULT_AUTO_BAN_LEADER_ID = "jd7envq8gzesxynzex5pjvcx0d7s2x2";
+const DEFAULT_AUTO_BAN_LEADER_ID = "jd7envq8gzesxynzex5pjvcx0d7s2x2a";
 
 export const get = query({
   args: {},

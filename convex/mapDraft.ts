@@ -3,7 +3,7 @@ import { mutation, internalMutation } from "./_generated/server";
 import { internal } from "./_generated/api";
 
 const MAP_BAN_TIMEOUT_MS = 60 * 1000; // 1 minute
-const DEFAULT_AUTO_BAN_MAP_ID = "jd7envq8gzesxynzex5pjvcx0d7s2x2";
+const DEFAULT_AUTO_BAN_MAP_ID = "jn7fecgcrpsn97x05hw81rk8z97sjwtw";
 
 export const startMapDraft = mutation({
   args: {

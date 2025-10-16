@@ -159,7 +159,10 @@ export default function CompletedMapsPage({
         )}
       </div>
       <div className="flex w-full items-center justify-between">
-       {lobby &&<> <Bans
+        {lobby && (
+          <>
+            {" "}
+            <Bans
               numberOfBans={
                 (lobby.numberOfBansFirstRotation +
                   lobby.numberOfBansSecondRotation) /
@@ -171,8 +174,7 @@ export default function CompletedMapsPage({
               }))}
               draftStatus={lobby.draftStatus}
             />
-
-        <Bans
+            <Bans
               numberOfBans={
                 (lobby.numberOfBansFirstRotation +
                   lobby.numberOfBansSecondRotation) /
@@ -184,7 +186,9 @@ export default function CompletedMapsPage({
               }))}
               isTeam2
               draftStatus={lobby.draftStatus}
-            /></>}
+            />
+          </>
+        )}
       </div>
     </div>
   );
