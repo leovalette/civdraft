@@ -1,12 +1,16 @@
-import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { v } from "convex/values"
+import { mutation, query, internalMutation } from "./_generated/server"
+import { internal } from "./_generated/api"
+
+const LEADER_BAN_TIMEOUT_MS = 60 * 1000 // 1 minute
+const DEFAULT_AUTO_BAN_LEADER_ID = "jd7envq8gzesxynzex5pjvcx0d7s2x2"
 
 export const get = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("leaders").collect();
+    return await ctx.db.query("leaders").collect()
   },
-});
+})
 
 export const banLeader = mutation({
   args: {
@@ -15,44 +19,63 @@ export const banLeader = mutation({
     teamNumber: v.union(v.literal(1), v.literal(2)),
   },
   handler: async (ctx, { lobbyId, leaderId, teamNumber }) => {
-    const lobby = await ctx.db.get(lobbyId);
-    if (!lobby) {
-      throw new Error("Lobby not found");
-    }
-
-    const team1BannedLeaders =
-      teamNumber === 1
-        ? [...lobby.team1.bannedLeaders, leaderId]
-        : lobby.team1.bannedLeaders;
-    const team2BannedLeaders =
-      teamNumber === 2
-        ? [...lobby.team2.bannedLeaders, leaderId]
-        : lobby.team2.bannedLeaders;
-
-    const isLastPick =
-      lobby.team1.selectedLeaders.length +
-        lobby.team2.selectedLeaders.length ===
-      lobby.numberOfPicksFirstRotation + lobby.numberOfPicksSecondRotation;
-
-    await ctx.db.patch(lobbyId, {
-      team1: {
-        ...lobby.team1,
-        bannedLeaders: team1BannedLeaders,
-      },
-      team2: {
-        ...lobby.team2,
-        bannedLeaders: team2BannedLeaders,
-      },
-      draftStatus: getNextDraftStatus(
-        lobby.draftStatus,
-        lobby.numberOfBansFirstRotation,
-        lobby.numberOfBansSecondRotation,
-        lobby.numberOfPicksFirstRotation,
-      ),
-      status: isLastPick ? "COMPLETED" : "LEADER_SELECTION",
-    });
+    await performLeaderBan(ctx, lobbyId, leaderId, teamNumber)
   },
-});
+})
+
+async function performLeaderBan(
+  ctx: any,
+  lobbyId: string,
+  leaderId: string,
+  teamNumber: 1 | 2,
+) {
+  const lobby = await ctx.db.get(lobbyId)
+  if (!lobby) {
+    throw new Error("Lobby not found")
+  }
+
+  const team1BannedLeaders =
+    teamNumber === 1
+      ? [...lobby.team1.bannedLeaders, leaderId]
+      : lobby.team1.bannedLeaders
+  const team2BannedLeaders =
+    teamNumber === 2
+      ? [...lobby.team2.bannedLeaders, leaderId]
+      : lobby.team2.bannedLeaders
+
+  const isLastPick =
+    lobby.team1.selectedLeaders.length +
+    lobby.team2.selectedLeaders.length ===
+    lobby.numberOfPicksFirstRotation + lobby.numberOfPicksSecondRotation
+
+  const now = Date.now()
+  await ctx.db.patch(lobbyId, {
+    team1: {
+      ...lobby.team1,
+      bannedLeaders: team1BannedLeaders,
+    },
+    team2: {
+      ...lobby.team2,
+      bannedLeaders: team2BannedLeaders,
+    },
+    draftStatus: getNextDraftStatus(
+      lobby.draftStatus,
+      lobby.numberOfBansFirstRotation,
+      lobby.numberOfBansSecondRotation,
+      lobby.numberOfPicksFirstRotation,
+    ),
+    status: isLastPick ? "COMPLETED" : "LEADER_SELECTION",
+    leaderBanTimestamp: now,
+  })
+
+  // If not the last pick, schedule the next timeout check
+  if (!isLastPick) {
+    await ctx.scheduler.runAfter(LEADER_BAN_TIMEOUT_MS, internal.leaders.checkLeaderBanTimeout, {
+      lobbyId,
+      timestampAtStart: now,
+    })
+  }
+}
 
 const getNextDraftStatus = (
   currentStatus: { type: "PICK" | "BAN" | "MAPBAN"; index: number },
@@ -62,22 +85,65 @@ const getNextDraftStatus = (
 ): { type: "PICK" | "BAN" | "MAPBAN"; index: number } => {
   const isLastFirstRotaBan =
     currentStatus.type === "BAN" &&
-    currentStatus.index + 1 === numberOfBansFirstRotation;
+    currentStatus.index + 1 === numberOfBansFirstRotation
   const isLastSecondRotaBan =
     currentStatus.type === "BAN" &&
     currentStatus.index + 1 ===
-      numberOfBansSecondRotation + numberOfBansFirstRotation;
+    numberOfBansSecondRotation + numberOfBansFirstRotation
   const isLastFirstRotaPick =
     currentStatus.type === "PICK" &&
-    currentStatus.index + 1 === numberOfPicksFirstRotation;
+    currentStatus.index + 1 === numberOfPicksFirstRotation
   if (isLastFirstRotaBan) {
-    return { type: "PICK", index: 1 };
+    return { type: "PICK", index: 1 }
   }
   if (isLastSecondRotaBan) {
-    return { type: "PICK", index: numberOfPicksFirstRotation + 1 };
+    return { type: "PICK", index: numberOfPicksFirstRotation + 1 }
   }
   if (isLastFirstRotaPick) {
-    return { type: "BAN", index: numberOfBansFirstRotation + 1 };
+    return { type: "BAN", index: numberOfBansFirstRotation + 1 }
   }
-  return { type: currentStatus.type, index: currentStatus.index + 1 };
-};
+  return { type: currentStatus.type, index: currentStatus.index + 1 }
+}
+
+export const checkLeaderBanTimeout = internalMutation({
+  args: {
+    lobbyId: v.id("lobbies"),
+    timestampAtStart: v.number(),
+  },
+  handler: async (ctx, { lobbyId, timestampAtStart }) => {
+    const lobby = await ctx.db.get(lobbyId)
+    if (!lobby) {
+      return // Lobby was deleted
+    }
+
+    // Check if the lobby is still in LEADER_SELECTION and the timestamp hasn't changed
+    // (meaning no ban was made since this timer was scheduled)
+    if (
+      lobby.status !== "LEADER_SELECTION" ||
+      lobby.leaderBanTimestamp === undefined ||
+      lobby.leaderBanTimestamp !== timestampAtStart
+    ) {
+      return // A ban was made or status changed, do nothing
+    }
+
+    // Auto-ban the default leader
+    await performLeaderBan(
+      ctx,
+      lobbyId,
+      DEFAULT_AUTO_BAN_LEADER_ID,
+      getCurrentTeamTurn(lobby.draftStatus),
+    )
+  },
+})
+
+// Helper function to determine which team's turn it is
+const getCurrentTeamTurn = (
+  draftStatus: { type: "PICK" | "BAN" | "MAPBAN"; index: number },
+): 1 | 2 => {
+  if (draftStatus.type === "PICK") {
+    return [1, 4, 6, 7].includes(draftStatus.index) ? 1 : 2
+  }
+  // In the draft system, odd bans/picks are team 1, even are team 2
+  // Adjust this logic based on your specific draft rules
+  return draftStatus.index % 2 === 1 ? 1 : 2
+}

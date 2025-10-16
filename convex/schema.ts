@@ -1,5 +1,5 @@
-import { defineSchema, defineTable } from "convex/server";
-import { v } from "convex/values";
+import { defineSchema, defineTable } from "convex/server"
+import { v } from "convex/values"
 
 export default defineSchema({
   leaders: defineTable({
@@ -63,5 +63,7 @@ export default defineSchema({
     chatMessages: v.array(
       v.object({ pseudo: v.string(), message: v.string() }),
     ),
+    mapBanTimestamp: v.optional(v.number()),
+    leaderBanTimestamp: v.optional(v.number()),
   }),
-});
+})
