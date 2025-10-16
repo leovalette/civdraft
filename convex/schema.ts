@@ -60,5 +60,8 @@ export default defineSchema({
       type: v.union(v.literal("PICK"), v.literal("BAN"), v.literal("MAPBAN")),
       index: v.number(),
     }),
+    chatMessages: v.array(
+      v.object({ pseudo: v.string(), message: v.string() }),
+    ),
   }),
 });
