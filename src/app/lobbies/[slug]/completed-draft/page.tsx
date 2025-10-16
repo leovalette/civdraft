@@ -2,13 +2,14 @@
 
 import { useQuery } from "convex/react";
 import Image from "next/image";
-import { use, useCallback, useMemo } from "react";
+import { use, useCallback, useEffect, useMemo } from "react";
 import { Bans } from "@/components/bans/Bans";
 import { CivPrimaryButton } from "@/components/CivPrimaryButton";
 import { TeamHeaders } from "@/components/TeamHeaders";
 import { TeamSelection } from "@/components/TeamSelection";
 import { api } from "../../../../../convex/_generated/api";
 import type { Id } from "../../../../../convex/_generated/dataModel";
+import router from "next/router";
 
 export default function CompletedMapsPage({
   params,
@@ -85,6 +86,18 @@ export default function CompletedMapsPage({
         selectedMap: selectedMap ? selectedMap.name : "",
       });
       navigator.clipboard.writeText(draftExported);
+    }
+  }, [lobby]);
+
+  useEffect(() => {
+    if (lobby?.status === "LOBBY") {
+      router.push(`/lobbies/${lobbyId}`);
+    }
+    if (lobby?.status === "MAP_SELECTION") {
+      router.push(`/lobbies/${lobbyId}/draft-maps`);
+    }
+    if (lobby?.status === "LEADER_SELECTION") {
+      router.push(`/lobbies/${lobbyId}/draft-leaders`);
     }
   }, [lobby]);
 

@@ -221,6 +221,10 @@ export const toggleTeamReady = mutation({
       throw new Error("Player not in any team");
     }
 
+    const areBothTeamReady = isPlayerInTeam1
+      ? !lobby.team1.isReady && lobby.team2.isReady
+      : lobby.team1.isReady && !lobby.team2.isReady;
+
     await ctx.db.patch(lobbyId, {
       team1: isPlayerInTeam1
         ? { ...lobby.team1, isReady: !lobby.team1.isReady }
@@ -228,6 +232,11 @@ export const toggleTeamReady = mutation({
       team2: isPlayerInTeam2
         ? { ...lobby.team2, isReady: !lobby.team2.isReady }
         : { ...lobby.team2 },
+      status: areBothTeamReady
+        ? lobby.withMapDraft
+          ? "MAP_SELECTION"
+          : "LEADER_SELECTION"
+        : "LOBBY",
     });
   },
 });

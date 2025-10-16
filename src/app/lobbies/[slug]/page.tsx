@@ -156,11 +156,14 @@ export default function LobbyPage({
   }, [lobby, userId]);
 
   useEffect(() => {
-    if (lobby?.team1.isReady && lobby.team2.isReady) {
-      // Navigate to the lobby page
-      lobby.withMapDraft
-        ? router.push(`/lobbies/${lobbyId}/draft-maps`)
-        : router.push(`/lobbies/${lobbyId}/draft-leaders`);
+    if (lobby?.status === "MAP_SELECTION") {
+      router.push(`/lobbies/${lobbyId}/draft-maps`);
+    }
+    if (lobby?.status === "LEADER_SELECTION") {
+      router.push(`/lobbies/${lobbyId}/draft-leaders`);
+    }
+    if (lobby?.status === "COMPLETED") {
+      router.push(`/lobbies/${lobbyId}/completed-draft`);
     }
   }, [lobby]);
 

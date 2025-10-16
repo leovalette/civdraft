@@ -90,11 +90,16 @@ export default function DraftMapsPage({
   }, [lobby, availableMaps]);
 
   useEffect(() => {
-    if (!lobby?.withMapDraft || filteredMaps.length <= 1) {
-      // Navigate to the lobby page
+    if (lobby?.status === "LOBBY") {
+      router.push(`/lobbies/${lobbyId}`);
+    }
+    if (lobby?.status === "LEADER_SELECTION") {
       router.push(`/lobbies/${lobbyId}/draft-leaders`);
     }
-  }, [filteredMaps]);
+    if (lobby?.status === "COMPLETED") {
+      router.push(`/lobbies/${lobbyId}/completed-draft`);
+    }
+  }, [lobby]);
 
   const onPostMessage = useCallback(
     (message: string) => postMessage({ message, pseudo, lobbyId }),

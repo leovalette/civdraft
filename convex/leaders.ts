@@ -29,6 +29,11 @@ export const banLeader = mutation({
         ? [...lobby.team2.bannedLeaders, leaderId]
         : lobby.team2.bannedLeaders;
 
+    const isLastPick =
+      lobby.team1.selectedLeaders.length +
+        lobby.team2.selectedLeaders.length ===
+      lobby.numberOfPicksFirstRotation + lobby.numberOfPicksSecondRotation;
+
     await ctx.db.patch(lobbyId, {
       team1: {
         ...lobby.team1,
@@ -44,6 +49,7 @@ export const banLeader = mutation({
         lobby.numberOfBansSecondRotation,
         lobby.numberOfPicksFirstRotation,
       ),
+      status: isLastPick ? "COMPLETED" : "LEADER_SELECTION",
     });
   },
 });

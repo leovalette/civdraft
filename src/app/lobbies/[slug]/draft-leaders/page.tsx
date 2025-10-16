@@ -126,13 +126,14 @@ export default function DraftMapsPage({
   };
 
   useEffect(() => {
-    if (
-      lobby?.draftStatus.type === "PICK" &&
-      lobby.draftStatus.index >
-        lobby.numberOfPicksFirstRotation + lobby.numberOfPicksSecondRotation
-    ) {
-      // Navigate to the lobby page
-      router.push(`/lobbies/${lobbyId}/completed-leaders`);
+    if (lobby?.status === "LOBBY") {
+      router.push(`/lobbies/${lobbyId}`);
+    }
+    if (lobby?.status === "MAP_SELECTION") {
+      router.push(`/lobbies/${lobbyId}/draft-maps`);
+    }
+    if (lobby?.status === "COMPLETED") {
+      router.push(`/lobbies/${lobbyId}/completed-draft`);
     }
   }, [lobby]);
 
