@@ -159,9 +159,32 @@ export default function CompletedMapsPage({
         )}
       </div>
       <div className="flex w-full items-center justify-between">
-        <Bans numberOfBans={0} bans={[]} />
+       {lobby &&<> <Bans
+              numberOfBans={
+                (lobby.numberOfBansFirstRotation +
+                  lobby.numberOfBansSecondRotation) /
+                2
+              }
+              bans={team1BannedLeaders.map(({ name, imageName }) => ({
+                name,
+                src: imageName,
+              }))}
+              draftStatus={lobby.draftStatus}
+            />
 
-        <Bans numberOfBans={0} bans={[]} />
+        <Bans
+              numberOfBans={
+                (lobby.numberOfBansFirstRotation +
+                  lobby.numberOfBansSecondRotation) /
+                2
+              }
+              bans={team2BannedLeaders.map(({ name, imageName }) => ({
+                name,
+                src: imageName,
+              }))}
+              isTeam2
+              draftStatus={lobby.draftStatus}
+            /></>}
       </div>
     </div>
   );

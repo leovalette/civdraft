@@ -14,6 +14,7 @@ import { getUserId, getUserPseudo } from "@/lib/user";
 import { api } from "../../../../../convex/_generated/api";
 import type { Id } from "../../../../../convex/_generated/dataModel";
 import { Chat } from "@/components/chat/Chat";
+import { Timer } from "@/components/Timer";
 
 export default function DraftMapsPage({
   params,
@@ -218,7 +219,7 @@ export default function DraftMapsPage({
               <Search value={search} setValue={setSearch} />
             </div>
             <div className="flex justify-between gap-6 sm:scale-75 md:scale-75 lg:scale-75">
-              {/* TODO <Timer timestamp={timestamp} timerDuration={60} /> */}
+              <Timer timestamp={new Date()} timerDuration={60} />
             </div>
           </div>
           <div className="flex h-4/5 flex-wrap justify-center gap-4 overflow-y-scroll">
