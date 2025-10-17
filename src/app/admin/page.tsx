@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { PresetManager } from "@/components/admin/PresetManager";
 import { useIsAdmin } from "@/hooks/useAdmin";
 
 export default function Admin() {
@@ -21,8 +22,8 @@ export default function Admin() {
   }
 
   return (
-    <div>
-      <h1>Admin Dashboard</h1>
+    <div className="w-full max-w-6xl mx-auto px-4 py-8">
+      <PresetManager />
     </div>
   );
 }
