@@ -2,6 +2,7 @@
 
 import { useQuery } from "convex/react";
 import Image from "next/image";
+import router from "next/router";
 import { use, useCallback, useEffect, useMemo } from "react";
 import { Bans } from "@/components/bans/Bans";
 import { CivPrimaryButton } from "@/components/CivPrimaryButton";
@@ -9,7 +10,6 @@ import { TeamHeaders } from "@/components/TeamHeaders";
 import { TeamSelection } from "@/components/TeamSelection";
 import { api } from "../../../../../convex/_generated/api";
 import type { Id } from "../../../../../convex/_generated/dataModel";
-import router from "next/router";
 
 export default function CompletedMapsPage({
   params,
@@ -58,7 +58,7 @@ export default function CompletedMapsPage({
       maps
         ?.filter((map) => lobby?.bannedMapIds.includes(map._id))
         .map((m) => m.name) ?? [],
-    [lobby],
+    [lobby, maps],
   );
 
   const selectedMap = useMemo(
@@ -87,7 +87,15 @@ export default function CompletedMapsPage({
       });
       navigator.clipboard.writeText(draftExported);
     }
-  }, [lobby]);
+  }, [
+    lobby,
+    bannedMaps,
+    selectedMap,
+    team1BannedLeaders,
+    team1SelectedLeaders,
+    team2BannedLeaders,
+    team2SelectedLeaders,
+  ]);
 
   useEffect(() => {
     if (lobby?.status === "LOBBY") {
@@ -99,7 +107,7 @@ export default function CompletedMapsPage({
     if (lobby?.status === "LEADER_SELECTION") {
       router.push(`/lobbies/${lobbyId}/draft-leaders`);
     }
-  }, [lobby]);
+  }, [lobby, lobbyId]);
 
   return (
     <div className="flex h-screen w-full flex-col items-center justify-center gap-2 p-8 text-text-primary">
@@ -161,32 +169,50 @@ export default function CompletedMapsPage({
       <div className="flex w-full items-center justify-between">
         {lobby && (
           <>
-            {" "}
-            <Bans
-              numberOfBans={
-                (lobby.numberOfBansFirstRotation +
-                  lobby.numberOfBansSecondRotation) /
-                2
-              }
-              bans={team1BannedLeaders.map(({ name, imageName }) => ({
-                name,
-                src: imageName,
-              }))}
-              draftStatus={lobby.draftStatus}
-            />
-            <Bans
-              numberOfBans={
-                (lobby.numberOfBansFirstRotation +
-                  lobby.numberOfBansSecondRotation) /
-                2
-              }
-              bans={team2BannedLeaders.map(({ name, imageName }) => ({
-                name,
-                src: imageName,
-              }))}
-              isTeam2
-              draftStatus={lobby.draftStatus}
-            />
+            <div>
+              <Bans
+                numberOfBans={lobby.numberOfBansFirstRotation / 2}
+                bans={team1BannedLeaders.map(({ name, imageName }) => ({
+                  name,
+                  src: imageName,
+                }))}
+                draftStatus={lobby.draftStatus}
+              />
+              <Bans
+                numberOfBans={lobby.numberOfBansSecondRotation / 2}
+                bans={team1BannedLeaders
+                  .reverse()
+                  .map(({ name, imageName }) => ({
+                    name,
+                    src: imageName,
+                  }))}
+                draftStatus={lobby.draftStatus}
+                isOdd
+              />
+            </div>
+            <div>
+              <Bans
+                numberOfBans={lobby.numberOfBansFirstRotation / 2}
+                bans={team2BannedLeaders.map(({ name, imageName }) => ({
+                  name,
+                  src: imageName,
+                }))}
+                isTeam2
+                isOdd
+                draftStatus={lobby.draftStatus}
+              />
+              <Bans
+                numberOfBans={lobby.numberOfBansSecondRotation / 2}
+                bans={team2BannedLeaders
+                  .reverse()
+                  .map(({ name, imageName }) => ({
+                    name,
+                    src: imageName,
+                  }))}
+                isTeam2
+                draftStatus={lobby.draftStatus}
+              />
+            </div>
           </>
         )}
       </div>

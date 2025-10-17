@@ -7,7 +7,6 @@ import { use, useCallback, useEffect, useMemo, useState } from "react";
 import { EditText, type onSaveProps } from "react-edit-text";
 import { Tooltip } from "react-tooltip";
 import { CivPrimaryButton } from "@/components/CivPrimaryButton";
-import { Button } from "@/components/ui/button";
 import { getUserId, getUserPseudo } from "@/lib/user";
 import { api } from "../../../../convex/_generated/api";
 import type { Id } from "../../../../convex/_generated/dataModel";
@@ -165,7 +164,7 @@ export default function LobbyPage({
     if (lobby?.status === "COMPLETED") {
       router.push(`/lobbies/${lobbyId}/completed-draft`);
     }
-  }, [lobby]);
+  }, [lobby, router, lobbyId]);
 
   return (
     <div className="flex h-screen w-10/12 flex-col text-white">

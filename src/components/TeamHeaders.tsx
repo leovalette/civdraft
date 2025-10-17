@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 
 const getDraftStatus = (
   team1: string,
@@ -35,15 +35,17 @@ export const TeamHeaders = ({
 }: TeamHeadersProps) => {
   const teamSelecting = useMemo<"TEAM1" | "TEAM2" | undefined>(() => {
     const statusNumber = Number(currentStatus.slice(-1));
-    if (isNaN(statusNumber)) {
+    if (Number.isNaN(statusNumber)) {
       return undefined;
     }
-    return !isNaN(statusNumber) && statusNumber % 2 === 1 ? "TEAM1" : "TEAM2";
+    return !Number.isNaN(statusNumber) && statusNumber % 2 === 1
+      ? "TEAM1"
+      : "TEAM2";
   }, [currentStatus]);
 
   const status = useMemo<string | undefined>(
     () => getDraftStatus(team1, team2, currentStatus),
-    [currentStatus, team1],
+    [currentStatus, team1, team2],
   );
 
   return (

@@ -1,6 +1,6 @@
 import { v } from "convex/values";
-import { mutation, internalMutation } from "./_generated/server";
 import { internal } from "./_generated/api";
+import { internalMutation, mutation } from "./_generated/server";
 
 const MAP_BAN_TIMEOUT_MS = 60 * 1000; // 1 minute
 const DEFAULT_AUTO_BAN_MAP_ID = "jn7fecgcrpsn97x05hw81rk8z97sjwtw";
@@ -79,6 +79,12 @@ async function performMapBan(
 
   const isLastban = totalBannedCount === lobby.mapIds.length - 1;
 
+  const selectedMapId = isLastban
+    ? lobby.mapIds.filter(
+        (id: string) => !lobby.bannedMapIds.includes(id) && id !== mapId,
+      )[0]
+    : undefined;
+
   const now = Date.now();
   await ctx.db.patch(lobbyId, {
     bannedMapIds: [...lobby.bannedMapIds, mapId],
@@ -93,12 +99,13 @@ async function performMapBan(
     currentTeamTurn: nextTeam,
     status: isLastban ? "LEADER_SELECTION" : "MAP_SELECTION",
     draftStatus: isLastban
-      ? { type: "PICK", index: 1 }
+      ? { type: "BAN", index: 1 }
       : {
           type: "MAPBAN",
           index: lobby.draftStatus.index + 1,
         },
     mapBanTimestamp: now,
+    selectedMapId,
   });
 
   // If not the last ban, schedule the next timeout check

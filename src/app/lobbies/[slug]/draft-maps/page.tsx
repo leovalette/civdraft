@@ -2,16 +2,16 @@
 
 import { useMutation, useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
-import { use, useCallback, useEffect, useMemo, useState } from "react";
+import { use, useCallback, useEffect, useMemo } from "react";
+import { Chat } from "@/components/chat/Chat";
 import { DraftActions } from "@/components/DraftActions";
 import { LeaderOrMap } from "@/components/Leader";
 import { TeamHeaders } from "@/components/TeamHeaders";
 import { TeamSelection } from "@/components/TeamSelection";
+import { Timer } from "@/components/Timer";
 import { getUserId, getUserPseudo } from "@/lib/user";
 import { api } from "../../../../../convex/_generated/api";
 import type { Id } from "../../../../../convex/_generated/dataModel";
-import { Chat } from "@/components/chat/Chat";
-import { Timer } from "@/components/Timer";
 
 export default function DraftMapsPage({
   params,
@@ -38,31 +38,37 @@ export default function DraftMapsPage({
     if (!lobby || !allMaps) {
       return [];
     }
-    return lobby.currentTeamTurn === 1
-      ? allMaps.filter(
-          (map) =>
-            lobby.team1.bannedMaps.includes(map._id) ||
-            map._id === selectedMapId,
-        )
-      : allMaps.filter((map) => lobby.team1.bannedMaps.includes(map._id));
-  }, [allMaps, lobby]);
+    return lobby.currentTeamTurn === 1 && selectedMapId
+      ? [
+          ...lobby.team1.bannedMaps.map((mapId) =>
+            allMaps.find((map) => map._id === mapId),
+          ),
+          allMaps.find((map) => map._id === selectedMapId),
+        ].filter((map) => map !== undefined)
+      : lobby.team1.bannedMaps
+          .map((mapId) => allMaps.find((map) => map._id === mapId))
+          .filter((map) => map !== undefined);
+  }, [allMaps, lobby, selectedMapId]);
 
   const team2BannedMaps = useMemo(() => {
     if (!lobby || !allMaps) {
       return [];
     }
-    return lobby.currentTeamTurn === 2
-      ? allMaps.filter(
-          (map) =>
-            lobby.team2.bannedMaps.includes(map._id) ||
-            map._id === selectedMapId,
-        )
-      : allMaps.filter((map) => lobby.team2.bannedMaps.includes(map._id));
-  }, [allMaps, lobby]);
+    return lobby.currentTeamTurn === 2 && selectedMapId
+      ? [
+          ...lobby.team2.bannedMaps.map((mapId) =>
+            allMaps.find((map) => map._id === mapId),
+          ),
+          allMaps.find((map) => map._id === selectedMapId),
+        ].filter((map) => map !== undefined)
+      : lobby.team2.bannedMaps
+          .map((mapId) => allMaps.find((map) => map._id === mapId))
+          .filter((map) => map !== undefined);
+  }, [allMaps, lobby, selectedMapId]);
 
   const isObserver = useMemo(
     () => lobby?.observers.some((observer) => observer.id === userId) ?? false,
-    [lobby],
+    [lobby, userId],
   );
 
   const canPlay = useMemo(() => {
@@ -71,7 +77,7 @@ export default function DraftMapsPage({
     const isPlayerTeam2 =
       lobby?.team2.players.some((player) => player.id === userId) ?? false;
     return (currentTeam === 1 ? isPlayerTeam1 : isPlayerTeam2) && !isObserver;
-  }, [currentTeam, isObserver]);
+  }, [currentTeam, isObserver, lobby, userId]);
 
   const handleConfirm = async () => {
     if (!selectedMapId) return;
@@ -117,7 +123,7 @@ export default function DraftMapsPage({
     if (lobby?.status === "COMPLETED") {
       router.push(`/lobbies/${lobbyId}/completed-draft`);
     }
-  }, [lobby]);
+  }, [lobby, router, lobbyId]);
 
   const onPostMessage = useCallback(
     (message: string) => postMessage({ message, pseudo, lobbyId }),
@@ -177,9 +183,11 @@ export default function DraftMapsPage({
                   pickBanType: "AVAILABLE",
                 }}
                 type="map"
-                onClick={() =>
-                  setSelectedMapId({ lobbyId, selectionId: map._id })
-                }
+                onClick={() => {
+                  if (canPlay) {
+                    setSelectedMapId({ lobbyId, selectionId: map._id });
+                  }
+                }}
               />
             ))}
           </div>
@@ -210,7 +218,7 @@ export default function DraftMapsPage({
           <Chat messages={chat ?? []} postMessage={onPostMessage} />
         </div>
       </div>
-      <div className="flex w-full items-center justify-between mt-4">
+      <div className="flex w-full items-center justify-center mt-4">
         {lobby && (
           <DraftActions
             currentStatus={`${lobby.draftStatus.type}${lobby.draftStatus.index}`}

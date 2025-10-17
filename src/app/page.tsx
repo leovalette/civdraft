@@ -10,6 +10,7 @@ import { SelectMaps } from "@/components/home/SelectMaps";
 import { SelectMode } from "@/components/home/SelectMode";
 import { setUserPseudo } from "@/lib/user";
 import { api } from "../../convex/_generated/api";
+import type { Id } from "../../convex/_generated/dataModel";
 
 export default function Home() {
   const leaders = useQuery(api.leaders.get);
@@ -21,8 +22,12 @@ export default function Home() {
   const [pseudo, setPseudo] = useState<string>("Player 1");
   const [team1, setTeam1] = useState<string>("Team 1");
   const [team2, setTeam2] = useState<string>("Team 2");
-  const [selectedMaps, setSelectedMaps] = useState<any[]>([]);
-  const [banCivs, setBanCivs] = useState<any[]>([]);
+  const [selectedMaps, setSelectedMaps] = useState<
+    { name: string; src: string; _id: string }[]
+  >([]);
+  const [banCivs, setBanCivs] = useState<
+    { name: string; _id: string; src: string }[]
+  >([]);
   const [preset, setPreset] = useState<{ id: string; label: string } | null>(
     null,
   );
@@ -42,12 +47,12 @@ export default function Home() {
         e ? { id: e.presetId, label: e.label ?? "Custom preset" } : null,
       );
       const selectedPreset = presets?.find((m) => m._id === e?.presetId);
-      if (selectedPreset) {
+      if (selectedPreset && maps) {
         const presetMaps = maps
-          ?.filter((map) => selectedPreset.mapIds.includes(map._id))
-          .map(({ name, imageName }) => ({ name, src: imageName }));
+          .filter((map) => selectedPreset.mapIds.includes(map._id))
+          .map(({ name, imageName, _id }) => ({ name, src: imageName, _id }));
 
-        setSelectedMaps(presetMaps || []);
+        setSelectedMaps(presetMaps);
       } else {
         setSelectedMaps([]);
       }
@@ -69,13 +74,13 @@ export default function Home() {
       const lobbyId = await createLobby({
         team1Name: team1 || "Team 1",
         team2Name: team2 || "Team 2",
-        autoBannedLeaderIds: banCivs.map(({ _id }) => _id),
+        autoBannedLeaderIds: banCivs.map(({ _id }) => _id as Id<"leaders">),
         numberOfBansFirstRotation: selectedPreset?.numberOfBansFirstRotation,
         numberOfBansSecondRotation: selectedPreset?.numberOfBansSecondRotation,
         numberOfPicksFirstRotation: selectedPreset?.numberOfPicksFirstRotation,
         numberOfPicksSecondRotation:
           selectedPreset?.numberOfPicksSecondRotation,
-        mapIds: selectedMaps.map(({ _id }) => _id),
+        mapIds: selectedMaps.map(({ _id }) => _id as Id<"maps">),
         mapDraft: selectedMaps.length > 0,
       });
 

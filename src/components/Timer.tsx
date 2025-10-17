@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./Timer.module.css";
 
 type TimerProps = {
@@ -58,7 +58,10 @@ export const Timer = ({ timestamp, timerDuration }: TimerProps) => {
         className={styles.baseSvg}
         viewBox="0 0 100 100"
         xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-labelledby="base-timer-title"
       >
+        <title id="base-timer-title">Countdown timer</title>
         <g className={styles.baseCircle}>
           <circle className={styles.pathElapsed} cx="50" cy="50" r="45" />
           <path

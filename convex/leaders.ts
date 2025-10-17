@@ -1,6 +1,6 @@
 import { v } from "convex/values";
-import { mutation, query, internalMutation } from "./_generated/server";
 import { internal } from "./_generated/api";
+import { internalMutation, mutation, query } from "./_generated/server";
 
 const LEADER_BAN_TIMEOUT_MS = 60 * 1000; // 1 minute
 const DEFAULT_AUTO_BAN_LEADER_ID = "jd7envq8gzesxynzex5pjvcx0d7s2x2a";
@@ -82,7 +82,10 @@ async function performLeaderPickBan(
     draftStatus: nextDraftStatus,
     status: isLastPick ? "COMPLETED" : "LEADER_SELECTION",
     leaderBanTimestamp: now,
-    currentTeamTurn: getCurrentTeamTurn(nextDraftStatus),
+    currentTeamTurn: getCurrentTeamTurn(
+      nextDraftStatus,
+      lobby.numberOfBansFirstRotation,
+    ),
   });
 
   // If not the last pick, schedule the next timeout check
@@ -152,20 +155,27 @@ export const checkLeaderBanTimeout = internalMutation({
       ctx,
       lobbyId,
       DEFAULT_AUTO_BAN_LEADER_ID,
-      getCurrentTeamTurn(lobby.draftStatus),
+      getCurrentTeamTurn(lobby.draftStatus, lobby.numberOfBansFirstRotation),
     );
   },
 });
 
 // Helper function to determine which team's turn it is
-const getCurrentTeamTurn = (draftStatus: {
-  type: "PICK" | "BAN" | "MAPBAN";
-  index: number;
-}): 1 | 2 => {
+const getCurrentTeamTurn = (
+  draftStatus: {
+    type: "PICK" | "BAN" | "MAPBAN";
+    index: number;
+  },
+  numberOfBansFirstRotation: number,
+): 1 | 2 => {
   if (draftStatus.type === "PICK") {
     return [1, 4, 6, 7].includes(draftStatus.index) ? 1 : 2;
   }
-  // In the draft system, odd bans/picks are team 1, even are team 2
-  // Adjust this logic based on your specific draft rules
+
+  if (draftStatus.type === "BAN") {
+    if (draftStatus.index > numberOfBansFirstRotation) {
+      return draftStatus.index % 2 === 1 ? 2 : 1;
+    }
+  }
   return draftStatus.index % 2 === 1 ? 1 : 2;
 };

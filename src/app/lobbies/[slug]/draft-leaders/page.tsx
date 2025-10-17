@@ -5,16 +5,16 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { use, useCallback, useEffect, useMemo, useState } from "react";
 import { Bans } from "@/components/bans/Bans";
+import { Chat } from "@/components/chat/Chat";
 import { DraftActions } from "@/components/DraftActions";
 import { LeaderOrMap } from "@/components/Leader";
 import { Search } from "@/components/Search";
 import { TeamHeaders } from "@/components/TeamHeaders";
 import { TeamSelection } from "@/components/TeamSelection";
+import { Timer } from "@/components/Timer";
 import { getUserId, getUserPseudo } from "@/lib/user";
 import { api } from "../../../../../convex/_generated/api";
 import type { Id } from "../../../../../convex/_generated/dataModel";
-import { Chat } from "@/components/chat/Chat";
-import { Timer } from "@/components/Timer";
 
 export default function DraftMapsPage({
   params,
@@ -42,61 +42,72 @@ export default function DraftMapsPage({
     if (!lobby || !leaders) {
       return [];
     }
-    return lobby.currentTeamTurn === 1 && lobby.draftStatus.type === "PICK"
-      ? leaders.filter(
-          (leader) =>
-            lobby.team1.selectedLeaders.includes(leader._id) ||
-            leader._id === selectedLeaderId,
-        )
-      : leaders.filter((leader) =>
-          lobby.team1.selectedLeaders.includes(leader._id),
-        );
+    return lobby.currentTeamTurn === 1 &&
+      lobby.draftStatus.type === "PICK" &&
+      selectedLeaderId
+      ? [
+          ...lobby.team1.selectedLeaders.map((leaderId) =>
+            leaders.find((leader) => leader._id === leaderId),
+          ),
+          leaders.find((leader) => leader._id === selectedLeaderId),
+        ].filter((leader) => leader !== undefined)
+      : lobby.team1.selectedLeaders
+          .map((leaderId) => leaders.find((leader) => leader._id === leaderId))
+          .filter((leader) => leader !== undefined);
   }, [leaders, lobby, selectedLeaderId]);
 
   const team2SelectedLeaders = useMemo(() => {
     if (!lobby || !leaders) {
       return [];
     }
-    return lobby.currentTeamTurn === 2 && lobby.draftStatus.type === "PICK"
-      ? leaders.filter(
-          (leader) =>
-            lobby.team2.selectedLeaders.includes(leader._id) ||
-            leader._id === selectedLeaderId,
-        )
-      : leaders.filter((leader) =>
-          lobby.team2.selectedLeaders.includes(leader._id),
-        );
+    return lobby.currentTeamTurn === 2 &&
+      lobby.draftStatus.type === "PICK" &&
+      selectedLeaderId
+      ? [
+          ...lobby.team2.selectedLeaders.map((leaderId) =>
+            leaders.find((leader) => leader._id === leaderId),
+          ),
+          leaders.find((leader) => leader._id === selectedLeaderId),
+        ].filter((leader) => leader !== undefined)
+      : lobby.team2.selectedLeaders
+          .map((leaderId) => leaders.find((leader) => leader._id === leaderId))
+          .filter((leader) => leader !== undefined);
   }, [leaders, lobby, selectedLeaderId]);
 
   const team1BannedLeaders = useMemo(() => {
     if (!lobby || !leaders) {
       return [];
     }
-    console.log(lobby.currentTeamTurn, lobby.draftStatus);
-    return lobby.currentTeamTurn === 1 && lobby.draftStatus.type === "BAN"
-      ? leaders.filter(
-          (leader) =>
-            lobby.team1.bannedLeaders.includes(leader._id) ||
-            leader._id === selectedLeaderId,
-        )
-      : leaders.filter((leader) =>
-          lobby.team1.bannedLeaders.includes(leader._id),
-        );
+    return lobby.currentTeamTurn === 1 &&
+      lobby.draftStatus.type === "BAN" &&
+      selectedLeaderId
+      ? [
+          ...lobby.team1.bannedLeaders.map((leaderId) =>
+            leaders.find((leader) => leader._id === leaderId),
+          ),
+          leaders.find((leader) => leader._id === selectedLeaderId),
+        ].filter((leader) => leader !== undefined)
+      : lobby.team1.bannedLeaders
+          .map((leaderId) => leaders.find((leader) => leader._id === leaderId))
+          .filter((leader) => leader !== undefined);
   }, [leaders, lobby, selectedLeaderId]);
 
   const team2BannedLeaders = useMemo(() => {
     if (!lobby || !leaders) {
       return [];
     }
-    return lobby.currentTeamTurn === 2 && lobby.draftStatus.type === "BAN"
-      ? leaders.filter(
-          (leader) =>
-            lobby.team2.bannedLeaders.includes(leader._id) ||
-            leader._id === selectedLeaderId,
-        )
-      : leaders.filter((leader) =>
-          lobby.team2.bannedLeaders.includes(leader._id),
-        );
+    return lobby.currentTeamTurn === 2 &&
+      lobby.draftStatus.type === "BAN" &&
+      selectedLeaderId
+      ? [
+          ...lobby.team2.bannedLeaders.map((leaderId) =>
+            leaders.find((leader) => leader._id === leaderId),
+          ),
+          leaders.find((leader) => leader._id === selectedLeaderId),
+        ].filter((leader) => leader !== undefined)
+      : lobby.team2.bannedLeaders
+          .map((leaderId) => leaders.find((leader) => leader._id === leaderId))
+          .filter((leader) => leader !== undefined);
   }, [leaders, lobby, selectedLeaderId]);
 
   const numberOfPicks = useMemo(() => {
@@ -110,7 +121,7 @@ export default function DraftMapsPage({
 
   const isObserver = useMemo(
     () => lobby?.observers.some((observer) => observer.id === userId) ?? false,
-    [lobby],
+    [lobby, userId],
   );
 
   const canPlay = useMemo(() => {
@@ -119,7 +130,7 @@ export default function DraftMapsPage({
     const isPlayerTeam2 =
       lobby?.team2.players.some((player) => player.id === userId) ?? false;
     return (currentTeam === 1 ? isPlayerTeam1 : isPlayerTeam2) && !isObserver;
-  }, [currentTeam, isObserver]);
+  }, [currentTeam, isObserver, lobby, userId]);
 
   const filteredLeaders = useMemo(
     () =>
@@ -136,10 +147,9 @@ export default function DraftMapsPage({
     [leaders, lobby, search],
   );
 
-  const selectedMap = useMemo(
-    () => maps?.find((map) => map._id === lobby?.selectedMapId),
-    [maps, lobby],
-  );
+  const selectedMap = useMemo(() => {
+    return maps?.find((map) => map._id === lobby?.selectedMapId);
+  }, [maps, lobby]);
 
   const handleConfirm = async () => {
     if (!selectedLeaderId) return;
@@ -166,7 +176,7 @@ export default function DraftMapsPage({
     if (lobby?.status === "COMPLETED") {
       router.push(`/lobbies/${lobbyId}/completed-draft`);
     }
-  }, [lobby]);
+  }, [lobby, lobbyId, router]);
 
   const onPostMessage = useCallback(
     (message: string) => postMessage({ message, pseudo, lobbyId }),
@@ -239,9 +249,11 @@ export default function DraftMapsPage({
                         : "AVAILABLE",
                 }}
                 type="leader"
-                onClick={() =>
-                  setSelectedLeaderId({ lobbyId, selectionId: leader._id })
-                }
+                onClick={() => {
+                  if (canPlay) {
+                    setSelectedLeaderId({ lobbyId, selectionId: leader._id });
+                  }
+                }}
               />
             ))}
           </div>
@@ -265,21 +277,29 @@ export default function DraftMapsPage({
           <Chat messages={chat ?? []} postMessage={onPostMessage} />
         </div>
       </div>
-      <div className="flex w-full items-center justify-between mt-4">
+      <div className="flex w-full items-center justify-between">
         {lobby && (
           <>
-            <Bans
-              numberOfBans={
-                (lobby.numberOfBansFirstRotation +
-                  lobby.numberOfBansSecondRotation) /
-                2
-              }
-              bans={team1BannedLeaders.map(({ name, imageName }) => ({
-                name,
-                src: imageName,
-              }))}
-              draftStatus={lobby.draftStatus}
-            />
+            <div>
+              <Bans
+                numberOfBans={lobby.numberOfBansFirstRotation / 2}
+                bans={team1BannedLeaders.map(({ name, imageName }) => ({
+                  name,
+                  src: imageName,
+                }))}
+                draftStatus={lobby.draftStatus}
+              />
+              <Bans
+                numberOfBans={lobby.numberOfBansSecondRotation / 2}
+                bans={team1BannedLeaders.map(({ name, imageName }) => ({
+                  name,
+                  src: imageName,
+                }))}
+                draftStatus={lobby.draftStatus}
+                offset={lobby.numberOfBansFirstRotation / 2}
+                isOdd
+              />
+            </div>
             <DraftActions
               currentStatus={`${lobby.draftStatus.type}${lobby.draftStatus.index}`}
               canPlay={canPlay}
@@ -287,19 +307,28 @@ export default function DraftMapsPage({
               isObserver={isObserver}
               disabled={!selectedLeaderId}
             />
-            <Bans
-              numberOfBans={
-                (lobby.numberOfBansFirstRotation +
-                  lobby.numberOfBansSecondRotation) /
-                2
-              }
-              bans={team2BannedLeaders.map(({ name, imageName }) => ({
-                name,
-                src: imageName,
-              }))}
-              isTeam2
-              draftStatus={lobby.draftStatus}
-            />
+            <div>
+              <Bans
+                numberOfBans={lobby.numberOfBansFirstRotation / 2}
+                bans={team2BannedLeaders.map(({ name, imageName }) => ({
+                  name,
+                  src: imageName,
+                }))}
+                isTeam2
+                isOdd
+                draftStatus={lobby.draftStatus}
+              />
+              <Bans
+                numberOfBans={lobby.numberOfBansSecondRotation / 2}
+                bans={team2BannedLeaders.map(({ name, imageName }) => ({
+                  name,
+                  src: imageName,
+                }))}
+                isTeam2
+                draftStatus={lobby.draftStatus}
+                offset={lobby.numberOfBansFirstRotation / 2}
+              />
+            </div>
           </>
         )}
       </div>

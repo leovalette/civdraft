@@ -2,9 +2,11 @@ import { Ban } from "./Ban";
 
 type BansProps = {
   numberOfBans: number;
-  bans: { src: string; name: string }[];
+  bans: Array<{ src: string; name: string } | undefined>;
   isTeam2?: boolean;
   draftStatus: { type: "PICK" | "BAN" | "MAPBAN"; index: number };
+  offset?: number;
+  isOdd?: boolean;
 };
 
 export const Bans = ({
@@ -12,10 +14,12 @@ export const Bans = ({
   numberOfBans,
   isTeam2,
   draftStatus,
+  offset = 0,
+  isOdd = false,
 }: BansProps) => {
   const normalizedBans = Array.from(
     { length: numberOfBans },
-    (_, index) => bans[index] ?? undefined,
+    (_, index) => bans[index + offset] ?? undefined,
   );
 
   return (
@@ -23,7 +27,8 @@ export const Bans = ({
       {normalizedBans.map((ban, index) => {
         return (
           <div
-            key={index}
+            // biome-ignore lint/suspicious/noArrayIndexKey: Needed for undefined bans
+            key={String(ban?.name) + index}
             className={`flex gap-1 ${isTeam2 ? "flex-row-reverse" : ""}`}
           >
             <Ban
@@ -31,9 +36,9 @@ export const Bans = ({
               currentBan={
                 draftStatus.type !== "BAN"
                   ? false
-                  : isTeam2
-                    ? index === (draftStatus.index - 2) / 2
-                    : index === (draftStatus.index - 1) / 2
+                  : isOdd
+                    ? index + offset === (draftStatus.index - 2) / 2
+                    : index + offset === (draftStatus.index - 1) / 2
               }
             />
           </div>

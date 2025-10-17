@@ -22,7 +22,8 @@ export const TeamSelection = ({
       <div className="flex flex-col gap-2">
         {Array.from({ length: numberOfPicks }).map((_, index) => (
           <SelectBox
-            key={leaderOrMaps[index]?.id ?? index}
+            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+            key={leaderOrMaps[index]?.id + index}
             leaderOrMap={leaderOrMaps[index]}
             currentPick={currentStatus === statuses[index]}
           />
