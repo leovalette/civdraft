@@ -1,5 +1,6 @@
 "use client";
 
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
@@ -8,6 +9,7 @@ import { Input } from "@/components/home/Input";
 import { SelectAutobans } from "@/components/home/SelectAutoBans";
 import { SelectMaps } from "@/components/home/SelectMaps";
 import { SelectMode } from "@/components/home/SelectMode";
+import { useIsAdmin } from "@/hooks/useAdmin";
 import { setUserPseudo } from "@/lib/user";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
@@ -107,42 +109,77 @@ export default function Home() {
     );
   }, [selectedMaps]);
 
+  const isAdmin = useIsAdmin();
+
   return (
-    <div className="w-96 flex flex-col gap-4 rounded-lg border border-golden-border bg-gradient-to-br from-indigo-200 p-6 text-bg-golden-border">
-      <Input value={team1} setValue={setTeam1} label="Team 1 name" />
-      <Input value={team2} setValue={setTeam2} label="Team 2 name" />
-      <Input value={pseudo} setValue={onPseudoChange} label="Pseudo" />
-      <SelectMode
-        preset={preset}
-        presets={presets?.map((m) => ({ id: m._id, label: m.name })) ?? []}
-        onChangePreset={onPresetChange}
-      />
-      <SelectAutobans
-        bansCiv={banCivs}
-        setBansCiv={setBanCivs}
-        bannableLeaders={bannableLeaders}
-      />
-      <SelectMaps
-        selectedMaps={selectedMaps}
-        setSelectedMaps={setSelectedMaps}
-        maps={
-          maps?.map(({ name, imageName, _id }) => ({
-            name,
-            src: imageName,
-            _id,
-          })) ?? []
-        }
-      />
-      <div className="pt-6">
-        <CivPrimaryButton
-          disabled={!isNumberOfMapsValid}
-          onClick={() => void onSubmit()}
-        >
-          Create Lobby
-        </CivPrimaryButton>
-        {!isNumberOfMapsValid && (
-          <div className="text-lg font-semibold ">Please select 3-5-7 maps</div>
-        )}
+    <div className="flex flex-col h-screen  w-full">
+      <div className="flex justify-between items-center p-6 bg-gradient-to-r from-indigo-900/20 to-purple-900/20 backdrop-blur-sm border-b border-golden-border">
+        <h1 className="text-3xl font-bold text-golden-border">CivDraft</h1>
+        <div className="flex gap-4 items-center">
+          <SignedOut>
+            <SignInButton mode="modal">
+              <button
+                type="button"
+                className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition-colors"
+              >
+                Sign In
+              </button>
+            </SignInButton>
+          </SignedOut>
+          <SignedIn>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
+        </div>
+      </div>
+
+      <div className="flex-1 flex justify-center items-center">
+        <div className="w-96 flex flex-col gap-4 rounded-lg border border-golden-border bg-gradient-to-br from-indigo-200 p-6 text-bg-golden-border">
+          {isAdmin && (
+            <CivPrimaryButton
+              disabled={!isNumberOfMapsValid}
+              onClick={() => void onSubmit()}
+            >
+              Create or Edit Preset
+            </CivPrimaryButton>
+          )}
+          <Input value={team1} setValue={setTeam1} label="Team 1 name" />
+          <Input value={team2} setValue={setTeam2} label="Team 2 name" />
+          <Input value={pseudo} setValue={onPseudoChange} label="Pseudo" />
+          <SelectMode
+            preset={preset}
+            presets={presets?.map((m) => ({ id: m._id, label: m.name })) ?? []}
+            onChangePreset={onPresetChange}
+          />
+          <SelectAutobans
+            bansCiv={banCivs}
+            setBansCiv={setBanCivs}
+            bannableLeaders={bannableLeaders}
+          />
+          <SelectMaps
+            selectedMaps={selectedMaps}
+            setSelectedMaps={setSelectedMaps}
+            maps={
+              maps?.map(({ name, imageName, _id }) => ({
+                name,
+                src: imageName,
+                _id,
+              })) ?? []
+            }
+          />
+          <div className="pt-6">
+            <CivPrimaryButton
+              disabled={!isNumberOfMapsValid}
+              onClick={() => void onSubmit()}
+            >
+              Create Lobby
+            </CivPrimaryButton>
+            {!isNumberOfMapsValid && (
+              <div className="text-lg font-semibold ">
+                Please select 3-5-7 maps
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

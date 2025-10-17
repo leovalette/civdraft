@@ -48,6 +48,9 @@ module.exports = {
       indigo: {
         ...colors.indigo,
       },
+      emerald: {
+        ...colors.emerald,
+      },
     },
   },
   plugins: [],

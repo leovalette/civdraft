@@ -13,6 +13,7 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as admin from "../admin.js";
 import type * as chat from "../chat.js";
 import type * as currentSelection from "../currentSelection.js";
 import type * as leaders from "../leaders.js";
@@ -20,6 +21,7 @@ import type * as lobbies from "../lobbies.js";
 import type * as mapDraft from "../mapDraft.js";
 import type * as maps from "../maps.js";
 import type * as presets from "../presets.js";
+import type * as users from "../users.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -30,6 +32,7 @@ import type * as presets from "../presets.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  admin: typeof admin;
   chat: typeof chat;
   currentSelection: typeof currentSelection;
   leaders: typeof leaders;
@@ -37,6 +40,7 @@ declare const fullApi: ApiFromModules<{
   mapDraft: typeof mapDraft;
   maps: typeof maps;
   presets: typeof presets;
+  users: typeof users;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,
