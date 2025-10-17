@@ -136,8 +136,9 @@ export default function Home() {
         <div className="w-96 flex flex-col gap-4 rounded-lg border border-golden-border bg-gradient-to-br from-indigo-200 p-6 text-bg-golden-border">
           {isAdmin && (
             <CivPrimaryButton
-              disabled={!isNumberOfMapsValid}
-              onClick={() => void onSubmit()}
+              onClick={() => {
+                router.push(`/admin`);
+              }}
             >
               Create or Edit Preset
             </CivPrimaryButton>
