@@ -1,10 +1,10 @@
 "use client";
 
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { SignInButton, UserButton, useAuth } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
+import { Github } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
-import { Github } from "lucide-react";
 import { CivPrimaryButton } from "@/components/CivPrimaryButton";
 import { Input } from "@/components/home/Input";
 import { SelectAutobans } from "@/components/home/SelectAutoBans";
@@ -16,6 +16,7 @@ import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
 
 export default function Home() {
+  const { userId } = useAuth();
   const leaders = useQuery(api.leaders.get);
   const presets = useQuery(api.presets.get);
   const maps = useQuery(api.maps.getAll);
@@ -126,7 +127,7 @@ export default function Home() {
           >
             <Github size={28} />
           </a>
-          <SignedOut>
+          {!userId ? (
             <SignInButton mode="modal">
               <button
                 type="button"
@@ -135,10 +136,9 @@ export default function Home() {
                 Sign In
               </button>
             </SignInButton>
-          </SignedOut>
-          <SignedIn>
+          ) : (
             <UserButton afterSignOutUrl="/" />
-          </SignedIn>
+          )}
         </div>
       </div>
 

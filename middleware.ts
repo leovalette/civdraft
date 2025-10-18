@@ -1,5 +1,4 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
 
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
 
@@ -8,9 +7,10 @@ export default clerkMiddleware(async (auth, req) => {
   if (isAdminRoute(req)) {
     const { userId } = await auth();
 
-    // If not authenticated, Clerk will handle redirect to sign-in
+    // If not authenticated, redirect to sign-in
     if (!userId) {
-      return auth.redirectToSignIn();
+      const { redirectToSignIn } = await auth();
+      return redirectToSignIn();
     }
 
     // Note: Role check will happen on the client side in the AdminPanel component

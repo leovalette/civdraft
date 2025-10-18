@@ -38,6 +38,7 @@ export default function DraftMapsPage({
     if (!lobby || !allMaps) {
       return [];
     }
+
     return lobby.currentTeamTurn === 1 && selectedMapId
       ? [
           ...lobby.team1.bannedMaps.map((mapId) =>
@@ -147,9 +148,9 @@ export default function DraftMapsPage({
             <TeamSelection
               leaderOrMaps={
                 team1BannedMaps?.map((map) => ({
-                  id: map._id,
-                  name: map.name,
-                  imageName: map.imageName,
+                  id: map!._id,
+                  name: map!.name,
+                  imageName: map!.imageName,
                   type: "map",
                 })) ?? []
               }
@@ -197,9 +198,9 @@ export default function DraftMapsPage({
             <TeamSelection
               leaderOrMaps={
                 team2BannedMaps?.map((map) => ({
-                  id: map._id,
-                  name: map.name,
-                  imageName: map.imageName,
+                  id: map!._id,
+                  name: map!.name,
+                  imageName: map!.imageName,
                   type: "map",
                 })) ?? []
               }

@@ -23,7 +23,7 @@ export const TeamSelection = ({
         {Array.from({ length: numberOfPicks }).map((_, index) => (
           <SelectBox
             // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-            key={leaderOrMaps[index]?.id + index}
+            key={(leaderOrMaps[index]?.id ?? 0) + index}
             leaderOrMap={leaderOrMaps[index]}
             currentPick={currentStatus === statuses[index]}
           />

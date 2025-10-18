@@ -201,9 +201,9 @@ export default function DraftMapsPage({
               <TeamSelection
                 leaderOrMaps={
                   team1SelectedLeaders.map((leader) => ({
-                    id: leader._id,
-                    name: leader.name,
-                    imageName: leader.imageName,
+                    id: leader!._id,
+                    name: leader!.name,
+                    imageName: leader!.imageName,
                     type: "leader",
                   })) ?? []
                 }
@@ -263,9 +263,9 @@ export default function DraftMapsPage({
             <TeamSelection
               leaderOrMaps={
                 team2SelectedLeaders.map((leader) => ({
-                  id: leader._id,
-                  name: leader.name,
-                  imageName: leader.imageName,
+                  id: leader!._id,
+                  name: leader!.name,
+                  imageName: leader!.imageName,
                   type: "leader",
                 })) ?? []
               }
@@ -283,17 +283,17 @@ export default function DraftMapsPage({
             <div>
               <Bans
                 numberOfBans={lobby.numberOfBansFirstRotation / 2}
-                bans={team1BannedLeaders.map(({ name, imageName }) => ({
-                  name,
-                  src: imageName,
+                bans={team1BannedLeaders.map((ban) => ({
+                  name: ban!.name,
+                  src: ban!.imageName,
                 }))}
                 draftStatus={lobby.draftStatus}
               />
               <Bans
                 numberOfBans={lobby.numberOfBansSecondRotation / 2}
-                bans={team1BannedLeaders.map(({ name, imageName }) => ({
-                  name,
-                  src: imageName,
+                bans={team1BannedLeaders.map((ban) => ({
+                  name: ban!.name,
+                  src: ban!.imageName,
                 }))}
                 draftStatus={lobby.draftStatus}
                 offset={lobby.numberOfBansFirstRotation / 2}
@@ -310,9 +310,9 @@ export default function DraftMapsPage({
             <div>
               <Bans
                 numberOfBans={lobby.numberOfBansFirstRotation / 2}
-                bans={team2BannedLeaders.map(({ name, imageName }) => ({
-                  name,
-                  src: imageName,
+                bans={team2BannedLeaders.map((ban) => ({
+                  name: ban!.name,
+                  src: ban!.imageName,
                 }))}
                 isTeam2
                 isOdd
@@ -320,9 +320,9 @@ export default function DraftMapsPage({
               />
               <Bans
                 numberOfBans={lobby.numberOfBansSecondRotation / 2}
-                bans={team2BannedLeaders.map(({ name, imageName }) => ({
-                  name,
-                  src: imageName,
+                bans={team2BannedLeaders.map((ban) => ({
+                  name: ban!.name,
+                  src: ban!.imageName,
                 }))}
                 isTeam2
                 draftStatus={lobby.draftStatus}

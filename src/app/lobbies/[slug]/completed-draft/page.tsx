@@ -23,41 +23,42 @@ export default function CompletedMapsPage({
 
   const team1SelectedLeaders = useMemo(
     () =>
-      leaders?.filter((leader) =>
-        lobby?.team1.selectedLeaders.includes(leader._id),
-      ) ?? [],
+      lobby?.team1.selectedLeaders
+        .map((leaderId) => leaders?.find((leader) => leader._id === leaderId))
+        .filter((leader) => leader !== undefined) ?? [],
     [leaders, lobby],
   );
 
   const team2SelectedLeaders = useMemo(
     () =>
-      leaders?.filter((leader) =>
-        lobby?.team2.selectedLeaders.includes(leader._id),
-      ) ?? [],
+      lobby?.team2.selectedLeaders
+        .map((leaderId) => leaders?.find((leader) => leader._id === leaderId))
+        .filter((leader) => leader !== undefined) ?? [],
     [leaders, lobby],
   );
 
   const team1BannedLeaders = useMemo(
     () =>
-      leaders?.filter((leader) =>
-        lobby?.team1.bannedLeaders.includes(leader._id),
-      ) ?? [],
+      lobby?.team1.bannedLeaders
+        .map((leaderId) => leaders?.find((leader) => leader._id === leaderId))
+        .filter((leader) => leader !== undefined) ?? [],
     [leaders, lobby],
   );
 
   const team2BannedLeaders = useMemo(
     () =>
-      leaders?.filter((leader) =>
-        lobby?.team2.bannedLeaders.includes(leader._id),
-      ) ?? [],
+      lobby?.team2.bannedLeaders
+        .map((leaderId) => leaders?.find((leader) => leader._id === leaderId))
+        .filter((leader) => leader !== undefined) ?? [],
     [leaders, lobby],
   );
 
   const bannedMaps = useMemo(
     () =>
-      maps
-        ?.filter((map) => lobby?.bannedMapIds.includes(map._id))
-        .map((m) => m.name) ?? [],
+      lobby?.bannedMapIds
+        .map((mapId) => maps?.find((map) => map._id === mapId))
+        .filter((map) => map !== undefined)
+        .map((m) => m!.name) ?? [],
     [lobby, maps],
   );
 
@@ -76,10 +77,10 @@ export default function CompletedMapsPage({
   const onCopy = useCallback(() => {
     if (lobby) {
       const draftExported = exportDraft({
-        picksTeam1: team1SelectedLeaders.map((leader) => leader.name),
-        picksTeam2: team2SelectedLeaders.map((leader) => leader.name),
-        bansTeam1: team1BannedLeaders.map((leader) => leader.name),
-        bansTeam2: team2BannedLeaders.map((leader) => leader.name),
+        picksTeam1: team1SelectedLeaders.map((leader) => leader!.name),
+        picksTeam2: team2SelectedLeaders.map((leader) => leader!.name),
+        bansTeam1: team1BannedLeaders.map((leader) => leader!.name),
+        bansTeam2: team2BannedLeaders.map((leader) => leader!.name),
         mapBans: bannedMaps,
         teamName1: lobby.team1.name,
         teamName2: lobby.team2.name,
@@ -125,9 +126,9 @@ export default function CompletedMapsPage({
           <TeamSelection
             leaderOrMaps={
               team1SelectedLeaders.map((leader) => ({
-                id: leader._id,
-                name: leader.name,
-                imageName: leader.imageName,
+                id: leader!._id,
+                name: leader!.name,
+                imageName: leader!.imageName,
                 type: "leader",
               })) ?? []
             }
@@ -154,9 +155,9 @@ export default function CompletedMapsPage({
           <TeamSelection
             leaderOrMaps={
               team2SelectedLeaders.map((leader) => ({
-                id: leader._id,
-                name: leader.name,
-                imageName: leader.imageName,
+                id: leader!._id,
+                name: leader!.name,
+                imageName: leader!.imageName,
                 type: "leader",
               })) ?? []
             }
@@ -172,20 +173,18 @@ export default function CompletedMapsPage({
             <div>
               <Bans
                 numberOfBans={lobby.numberOfBansFirstRotation / 2}
-                bans={team1BannedLeaders.map(({ name, imageName }) => ({
-                  name,
-                  src: imageName,
+                bans={team1BannedLeaders.map((ban) => ({
+                  name: ban!.name,
+                  src: ban!.imageName,
                 }))}
                 draftStatus={lobby.draftStatus}
               />
               <Bans
                 numberOfBans={lobby.numberOfBansSecondRotation / 2}
-                bans={team1BannedLeaders
-                  .reverse()
-                  .map(({ name, imageName }) => ({
-                    name,
-                    src: imageName,
-                  }))}
+                bans={team1BannedLeaders.reverse().map((ban) => ({
+                  name: ban!.name,
+                  src: ban!.imageName,
+                }))}
                 draftStatus={lobby.draftStatus}
                 isOdd
               />
@@ -193,9 +192,9 @@ export default function CompletedMapsPage({
             <div>
               <Bans
                 numberOfBans={lobby.numberOfBansFirstRotation / 2}
-                bans={team2BannedLeaders.map(({ name, imageName }) => ({
-                  name,
-                  src: imageName,
+                bans={team2BannedLeaders.map((ban) => ({
+                  name: ban!.name,
+                  src: ban!.imageName,
                 }))}
                 isTeam2
                 isOdd
@@ -203,12 +202,10 @@ export default function CompletedMapsPage({
               />
               <Bans
                 numberOfBans={lobby.numberOfBansSecondRotation / 2}
-                bans={team2BannedLeaders
-                  .reverse()
-                  .map(({ name, imageName }) => ({
-                    name,
-                    src: imageName,
-                  }))}
+                bans={team2BannedLeaders.reverse().map((ban) => ({
+                  name: ban!.name,
+                  src: ban!.imageName,
+                }))}
                 isTeam2
                 draftStatus={lobby.draftStatus}
               />
