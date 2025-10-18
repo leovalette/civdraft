@@ -3,7 +3,11 @@ import Select, { type MultiValue } from "react-select";
 import { LeaderOrMapSelectFormatOption } from "./LeaderOrMapSelectFormatOption";
 
 const filterOptions = (
-  candidate: { label: string; value: string; data: any },
+  candidate: {
+    label: string;
+    value: string;
+    data: { name: string; src: string; _id: string };
+  },
   search: string,
 ) => {
   return candidate.data.name.toLowerCase().includes(search.toLowerCase());

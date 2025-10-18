@@ -4,15 +4,14 @@ import { LeaderOrMapSelectFormatOption } from "./LeaderOrMapSelectFormatOption";
 import { selectStyles } from "./selectStyles";
 
 const filterOptions = (
-  candidate: { label: string; value: string; data: any },
+  candidate: {
+    label: string;
+    value: string;
+    data: { name: string; src: string; _id: string };
+  },
   search: string,
 ) => {
-  return (
-    candidate.data.name.toLowerCase().includes(search.toLowerCase()) ||
-    candidate.data.filters
-      .map((filter: string) => filter.toLowerCase())
-      .find((filter: string) => filter.includes(search.toLowerCase()))
-  );
+  return candidate.data.name.toLowerCase().includes(search.toLowerCase());
 };
 
 type Props = {
