@@ -47,7 +47,7 @@ pnpm install
 
 3. Set up environment variables (ask project maintainers for `.env.local`):
 ```bash
-# Create .env.local with necessary keys for Clerk and Convex
+# Create .env.local with necessary keys for Clerk and Convex. ASK FOR THEM TO THE CODEOWNER
 ```
 
 4. Run the development server:
@@ -78,7 +78,7 @@ We welcome contributions to Civdraft! Here's how you can help:
 
 ### Getting Started with Contributing
 
-1. **Fork the repository** on GitHub
+1. **Clone the repository** on GitHub
 2. **Create a feature branch** for your changes:
    ```bash
    git checkout -b feature/your-feature-name
@@ -88,7 +88,6 @@ We welcome contributions to Civdraft! Here's how you can help:
    git commit -m "Add description of changes"
    ```
 4. **Ensure code quality**:
-   - Run `pnpm lint` to check for linting issues
    - Run `pnpm format` to format your code
 5. **Push to your fork** and **create a Pull Request** against the main branch
 6. **Describe your changes** in the PR description, including:
