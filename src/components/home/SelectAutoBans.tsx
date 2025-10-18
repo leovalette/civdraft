@@ -28,7 +28,9 @@ export const SelectAutobans: FC<Props> = ({
     <div className="text-lg font-semibold ">Autoban civs</div>
     <Select
       instanceId="select-autobans"
-      options={bannableLeaders}
+      options={[...bannableLeaders].sort((a, b) =>
+        a.name.localeCompare(b.name),
+      )}
       placeholder="Select ban"
       value={bansCiv}
       onChange={(

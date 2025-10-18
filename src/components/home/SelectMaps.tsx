@@ -30,7 +30,7 @@ export const SelectMaps: FC<Props> = ({
     <div className="text-lg font-semibold ">Maps to draft</div>
     <Select
       instanceId="select-maps"
-      options={maps}
+      options={[...maps].sort((a, b) => a.name.localeCompare(b.name))}
       placeholder="Select map"
       value={selectedMaps}
       onChange={(
