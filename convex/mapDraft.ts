@@ -1,26 +1,27 @@
-import { v } from "convex/values";
-import { internal } from "./_generated/api";
-import { internalMutation, mutation } from "./_generated/server";
+import { v } from "convex/values"
+import { internal } from "./_generated/api"
+import { internalMutation, mutation } from "./_generated/server"
 
-const MAP_BAN_TIMEOUT_MS = 60 * 1000; // 1 minute
-const DEFAULT_AUTO_BAN_MAP_ID = "jn7fecgcrpsn97x05hw81rk8z97sjwtw";
+const MAP_BAN_TIMEOUT_MS = 60 * 1000 // 1 minute
+const DEFAULT_AUTO_BAN_MAP_ID_DEV = "jn7fecgcrpsn97x05hw81rk8z97sjwtw"
+const DEFAULT_AUTO_BAN_MAP_ID_PROD = "j974thpwrm9p782e0n9j9tnyv57spqrv"
 
 export const startMapDraft = mutation({
   args: {
     lobbyId: v.id("lobbies"),
   },
   handler: async (ctx, { lobbyId }) => {
-    const lobby = await ctx.db.get(lobbyId);
+    const lobby = await ctx.db.get(lobbyId)
     if (!lobby) {
-      throw new Error("Lobby not found");
+      throw new Error("Lobby not found")
     }
 
-    const now = Date.now();
+    const now = Date.now()
     await ctx.db.patch(lobbyId, {
       status: "MAP_SELECTION",
       currentTeamTurn: 1,
       mapBanTimestamp: now,
-    });
+    })
 
     // Schedule a timer check for auto-ban
     await ctx.scheduler.runAfter(
@@ -30,9 +31,9 @@ export const startMapDraft = mutation({
         lobbyId,
         timestampAtStart: now,
       },
-    );
+    )
   },
-});
+})
 
 export const banMap = mutation({
   args: {
@@ -41,9 +42,9 @@ export const banMap = mutation({
     teamNumber: v.union(v.literal(1), v.literal(2)),
   },
   handler: async (ctx, { lobbyId, mapId, teamNumber }) => {
-    await performMapBan(ctx, lobbyId, mapId, teamNumber);
+    await performMapBan(ctx, lobbyId, mapId, teamNumber)
   },
-});
+})
 
 async function performMapBan(
   ctx: any,
@@ -51,41 +52,41 @@ async function performMapBan(
   mapId: string,
   teamNumber: 1 | 2,
 ) {
-  const lobby = await ctx.db.get(lobbyId);
+  const lobby = await ctx.db.get(lobbyId)
   if (!lobby) {
-    throw new Error("Lobby not found");
+    throw new Error("Lobby not found")
   }
   if (lobby.status !== "MAP_SELECTION") {
-    return;
+    return
   }
   if (!lobby.mapIds.includes(mapId)) {
-    throw new Error("Map not in the list of available maps");
+    throw new Error("Map not in the list of available maps")
   }
   if (lobby.bannedMapIds.includes(mapId)) {
-    throw new Error("Map already banned");
+    throw new Error("Map already banned")
   }
 
   const team1BannedMaps =
     teamNumber === 1
       ? [...lobby.team1.bannedMaps, mapId]
-      : lobby.team1.bannedMaps;
+      : lobby.team1.bannedMaps
   const team2BannedMaps =
     teamNumber === 2
       ? [...lobby.team2.bannedMaps, mapId]
-      : lobby.team2.bannedMaps;
+      : lobby.team2.bannedMaps
 
-  const totalBannedCount = team1BannedMaps.length + team2BannedMaps.length;
-  const nextTeam = totalBannedCount % 2 === 0 ? 1 : 2;
+  const totalBannedCount = team1BannedMaps.length + team2BannedMaps.length
+  const nextTeam = totalBannedCount % 2 === 0 ? 1 : 2
 
-  const isLastban = totalBannedCount === lobby.mapIds.length - 1;
+  const isLastban = totalBannedCount === lobby.mapIds.length - 1
 
   const selectedMapId = isLastban
     ? lobby.mapIds.filter(
-        (id: string) => !lobby.bannedMapIds.includes(id) && id !== mapId,
-      )[0]
-    : undefined;
+      (id: string) => !lobby.bannedMapIds.includes(id) && id !== mapId,
+    )[0]
+    : undefined
 
-  const now = Date.now();
+  const now = Date.now()
   await ctx.db.patch(lobbyId, {
     bannedMapIds: [...lobby.bannedMapIds, mapId],
     team1: {
@@ -101,12 +102,12 @@ async function performMapBan(
     draftStatus: isLastban
       ? { type: "BAN", index: 1 }
       : {
-          type: "MAPBAN",
-          index: lobby.draftStatus.index + 1,
-        },
+        type: "MAPBAN",
+        index: lobby.draftStatus.index + 1,
+      },
     mapBanTimestamp: now,
     selectedMapId,
-  });
+  })
 
   // If not the last ban, schedule the next timeout check
   if (!isLastban) {
@@ -117,7 +118,7 @@ async function performMapBan(
         lobbyId,
         timestampAtStart: now,
       },
-    );
+    )
   }
 }
 
@@ -127,9 +128,9 @@ export const checkMapBanTimeout = internalMutation({
     timestampAtStart: v.number(),
   },
   handler: async (ctx, { lobbyId, timestampAtStart }) => {
-    const lobby = await ctx.db.get(lobbyId);
+    const lobby = await ctx.db.get(lobbyId)
     if (!lobby) {
-      return; // Lobby was deleted
+      return // Lobby was deleted
     }
 
     // Check if the lobby is still in MAP_SELECTION and the timestamp hasn't changed
@@ -139,15 +140,15 @@ export const checkMapBanTimeout = internalMutation({
       lobby.mapBanTimestamp === undefined ||
       lobby.mapBanTimestamp !== timestampAtStart
     ) {
-      return; // A ban was made or status changed, do nothing
+      return // A ban was made or status changed, do nothing
     }
 
     // Auto-ban the default map
     await performMapBan(
       ctx,
       lobbyId,
-      DEFAULT_AUTO_BAN_MAP_ID,
+      DEFAULT_AUTO_BAN_MAP_ID_PROD,
       lobby.currentTeamTurn || 1,
-    );
+    )
   },
-});
+})
