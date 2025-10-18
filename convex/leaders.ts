@@ -38,6 +38,14 @@ async function performLeaderPickBan(
   if (lobby.status !== "LEADER_SELECTION") {
     return;
   }
+  if (
+    lobby.team1.bannedLeaders.includes(leaderId) ||
+    lobby.team2.bannedLeaders.includes(leaderId) ||
+    lobby.team1.selectedLeaders.includes(leaderId) ||
+    lobby.team2.selectedLeaders.includes(leaderId)
+  ) {
+    throw new Error("Leader already banned");
+  }
 
   const team1BannedLeaders =
     lobby.draftStatus.type === "BAN" && teamNumber === 1
