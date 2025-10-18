@@ -136,13 +136,10 @@ export default function DraftMapsPage({
     () =>
       leaders?.filter(
         (leader) =>
-          !lobby?.team1.selectedLeaders.includes(leader._id) &&
-          !lobby?.team2.selectedLeaders.includes(leader._id) &&
           leader.name
             .toLowerCase()
             .trim()
-            .includes(search.toLowerCase().trim()) &&
-          leader.name !== "TIMEOUT",
+            .includes(search.toLowerCase().trim()) && leader.name !== "TIMEOUT",
       ) ?? [],
     [leaders, lobby, search],
   );
@@ -184,7 +181,7 @@ export default function DraftMapsPage({
   );
 
   return (
-    <div className="flex  h-screen w-full flex-col items-center justify-center gap-2 px-8 text-text-primary">
+    <div className="flex  h-screen w-full flex-col items-center justify-center gap-2 p-8 text-text-primary">
       <div className="w-full">
         {lobby && (
           <TeamHeaders
@@ -244,9 +241,13 @@ export default function DraftMapsPage({
                     ? "BANT1"
                     : lobby?.team2.bannedLeaders.includes(leader._id)
                       ? "BANT2"
-                      : lobby?.autoBannedLeaderIds.includes(leader._id)
-                        ? "AUTOBAN"
-                        : "AVAILABLE",
+                      : lobby?.team1.selectedLeaders.includes(leader._id)
+                        ? "PICKT1"
+                        : lobby?.team2.selectedLeaders.includes(leader._id)
+                          ? "PICKT2"
+                          : lobby?.autoBannedLeaderIds.includes(leader._id)
+                            ? "AUTOBAN"
+                            : "AVAILABLE",
                 }}
                 type="leader"
                 onClick={() => {

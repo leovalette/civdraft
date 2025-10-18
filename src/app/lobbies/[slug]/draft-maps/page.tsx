@@ -132,7 +132,7 @@ export default function DraftMapsPage({
   );
 
   return (
-    <div className="flex  h-screen w-full flex-col items-center justify-center gap-2 px-8 text-text-primary">
+    <div className="flex  h-screen w-full flex-col items-center justify-center gap-2 p-8 text-text-primary">
       <div className="w-full">
         {lobby && (
           <TeamHeaders

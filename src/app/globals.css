@@ -2,6 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .cross-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+  }
+
+  .cross-container::before,
+  .cross-container::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    height: 4px;
+    background-color: #aa1e1e;
+  }
+
+  .cross-container::before {
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+
+  .cross-container::after {
+    transform: translate(-50%, -50%) rotate(-45deg);
+  }
+}
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);

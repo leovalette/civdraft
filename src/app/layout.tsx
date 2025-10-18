@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Civ drafter",
+  title: "CivDraft",
   description: "Civilization VI leader and map drafter",
 };
 
