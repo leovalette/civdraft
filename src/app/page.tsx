@@ -4,6 +4,7 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
+import { Github } from "lucide-react";
 import { CivPrimaryButton } from "@/components/CivPrimaryButton";
 import { Input } from "@/components/home/Input";
 import { SelectAutobans } from "@/components/home/SelectAutoBans";
@@ -116,6 +117,15 @@ export default function Home() {
       <div className="flex justify-between items-center p-6 bg-gradient-to-r from-indigo-900/20 to-purple-900/20 backdrop-blur-sm border-b border-golden-border">
         <h1 className="text-3xl font-bold text-golden-border">CivDraft</h1>
         <div className="flex gap-4 items-center">
+          <a
+            href="https://github.com/leovalette/civdraft"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-golden-border hover:text-emerald-400 transition-colors"
+            aria-label="GitHub repository"
+          >
+            <Github size={28} />
+          </a>
           <SignedOut>
             <SignInButton mode="modal">
               <button
