@@ -127,10 +127,12 @@ export const joinTeam1 = mutation({
           ...lobby.team1.players,
           { id: playerId, pseudo: playerPseudo },
         ],
+        isReady: false,
       },
       team2: {
         ...lobby.team2,
         players: lobby.team2.players.filter(({ id }) => id !== playerId),
+        isReady: false,
       },
       observers: lobby.observers.filter(({ id }) => id !== playerId),
     });
@@ -158,10 +160,12 @@ export const joinTeam2 = mutation({
           ...lobby.team2.players,
           { id: playerId, pseudo: playerPseudo },
         ],
+        isReady: false,
       },
       team1: {
         ...lobby.team1,
         players: lobby.team1.players.filter(({ id }) => id !== playerId),
+        isReady: false,
       },
       observers: lobby.observers.filter(({ id }) => id !== playerId),
     });
