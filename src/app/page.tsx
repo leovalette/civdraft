@@ -170,11 +170,13 @@ export default function Home() {
             selectedMaps={selectedMaps}
             setSelectedMaps={setSelectedMaps}
             maps={
-              maps?.map(({ name, imageName, _id }) => ({
-                name,
-                src: imageName,
-                _id,
-              })) ?? []
+              maps
+                ?.filter(({ name }) => name !== "TIMEOUT")
+                ?.map(({ name, imageName, _id }) => ({
+                  name,
+                  src: imageName,
+                  _id,
+                })) ?? []
             }
           />
           <div className="pt-6">
