@@ -134,14 +134,17 @@ export default function DraftMapsPage({
 
   const filteredLeaders = useMemo(
     () =>
-      leaders?.filter(
-        (leader) =>
-          leader.name
-            .toLowerCase()
-            .trim()
-            .includes(search.toLowerCase().trim()) && leader.name !== "TIMEOUT",
-      ) ?? [],
-    [leaders, lobby, search],
+      leaders
+        ?.filter(
+          (leader) =>
+            leader.name
+              .toLowerCase()
+              .trim()
+              .includes(search.toLowerCase().trim()) &&
+            leader.name !== "TIMEOUT",
+        )
+        .sort((a, b) => a.name.localeCompare(b.name)) ?? [],
+    [leaders, search],
   );
 
   const selectedMap = useMemo(() => {
