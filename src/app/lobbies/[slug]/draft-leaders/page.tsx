@@ -216,8 +216,8 @@ export default function DraftMapsPage({
                   className="flex h-28 w-28 items-center justify-center rounded-xl text-center sm:h-12 sm:w-12 md:h-16 md:w-16 lg:h-20 lg:w-20 xl:h-28 xl:w-28"
                   src={`/maps/${selectedMap.imageName}`}
                   alt={selectedMap.name}
-                  width={48}
-                  height={48}
+                  width={112}
+                  height={112}
                 />
               )}
             </>

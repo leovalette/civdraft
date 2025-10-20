@@ -256,8 +256,9 @@ export default function LobbyPage({
                 <Image
                   key={leader.name}
                   src={leader.src}
-                  width={48}
-                  height={48}
+                  width={112}
+                  height={112}
+                  quality={100}
                   alt="leader-image"
                 />
               ))}
@@ -276,8 +277,8 @@ export default function LobbyPage({
                 <Image
                   key={map.name}
                   src={`${map.src}`}
-                  width={48}
-                  height={48}
+                  width={112}
+                  height={112}
                   alt="map-image"
                   data-tooltip-id={map.name}
                   data-tooltip-content={map.name}

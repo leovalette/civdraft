@@ -61,8 +61,9 @@ export const LeaderOrMap = ({
           src={`/${type === "leader" ? "leaders" : "maps"}/${leaderOrMap.imageName}`}
           alt={leaderOrMap.name}
           onClick={clickOrNotToClick}
-          width={48}
-          height={48}
+          width={112}
+          height={112}
+          quality={100}
         />
       </div>
       <div

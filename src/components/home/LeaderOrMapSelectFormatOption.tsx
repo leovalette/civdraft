@@ -14,8 +14,9 @@ export const LeaderOrMapSelectFormatOption: FC<Props> = ({
       src={`/${type}/${leaderOrMap.src}`}
       width={32}
       height={32}
-      className="mr-2 h-8 w-8"
+      className="mr-2 h-8 w-8 "
       alt={leaderOrMap.name}
+      quality={100}
     />
     <span className="text-sm">{leaderOrMap.name}</span>
   </div>

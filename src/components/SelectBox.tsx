@@ -21,8 +21,9 @@ export const SelectBox = ({ leaderOrMap, currentPick }: SelectBoxProps) => {
           className="flex h-28 w-28 items-center justify-center rounded-xl text-center sm:h-12 sm:w-12 md:h-16 md:w-16 lg:h-20 lg:w-20 xl:h-28 xl:w-28"
           src={`/${leaderOrMap.type === "leader" ? "leaders" : "maps"}/${leaderOrMap.imageName}`}
           alt={leaderOrMap.name}
-          width={48}
-          height={48}
+          width={112}
+          height={112}
+          quality={100}
         />
       ) : (
         <div>Waiting for selection</div>

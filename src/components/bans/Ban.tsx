@@ -23,8 +23,9 @@ export const Ban = ({ leader, currentBan }: BanLeaderProps) => {
               className="flex h-28 w-28 items-center justify-center rounded-full sm:h-12 sm:w-12 md:h-16 md:w-16 lg:h-20 lg:w-20 xl:h-28 xl:w-28 "
               src={`/leaders/${leader.src}`}
               alt={leader.name ?? "Waiting for ban"}
-              width={48}
-              height={48}
+              width={112}
+              height={112}
+              quality={100}
             ></Image>
           </div>
         ) : (
@@ -32,8 +33,9 @@ export const Ban = ({ leader, currentBan }: BanLeaderProps) => {
             className="flex h-28 w-28 items-center justify-center rounded-full sm:h-12 sm:w-12 md:h-16 md:w-16 lg:h-20 lg:w-20 xl:h-28 xl:w-28"
             src={`/leaders/${leader.src}`}
             alt={leader.name ?? "Waiting for ban"}
-            width={48}
-            height={48}
+            width={112}
+            height={112}
+            quality={100}
           ></Image>
         )
       ) : (
