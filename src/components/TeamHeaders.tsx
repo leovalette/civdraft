@@ -14,7 +14,7 @@ const getDraftStatus = (
       : `${team2} is banning a map`;
   }
   if (currentStatus.startsWith("PICK")) {
-    return Number(currentStatus.replace("PICK", "")) % 2 === 1
+    return ["PICK1", "PICK4", "PICK6", "PICK7"].includes(currentStatus)
       ? `${team1} is picking`
       : `${team2} is picking`;
   }
