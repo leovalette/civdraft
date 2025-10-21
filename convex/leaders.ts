@@ -91,6 +91,7 @@ async function performLeaderPickBan(
     draftStatus: nextDraftStatus,
     status: isLastPick ? "COMPLETED" : "LEADER_SELECTION",
     leaderBanTimestamp: now,
+    currentSelectionId: undefined,
     currentTeamTurn: getCurrentTeamTurn(
       nextDraftStatus,
       lobby.numberOfBansFirstRotation,

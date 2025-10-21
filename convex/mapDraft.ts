@@ -106,6 +106,7 @@ async function performMapBan(
           index: lobby.draftStatus.index + 1,
         },
     mapBanTimestamp: now,
+    currentSelectionId: undefined,
     selectedMapId,
   });
 
