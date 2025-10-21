@@ -4,6 +4,7 @@ const getDraftStatus = (
   team1: string,
   team2: string,
   currentStatus: `${"PICK" | "BAN" | "MAPBAN"}${number}`,
+  numberOfBansFirstRotation: number,
 ) => {
   if (!currentStatus) {
     return "Waiting for players...";
@@ -18,7 +19,13 @@ const getDraftStatus = (
       ? `${team1} is picking`
       : `${team2} is picking`;
   }
-  return Number(currentStatus.replace("BAN", "")) % 2 === 1
+  const banNumber = Number(currentStatus.replace("BAN", ""));
+  if (banNumber > numberOfBansFirstRotation) {
+    return banNumber % 2 === 1
+      ? `${team2} is banning a leader`
+      : `${team1} is banning a leader`;
+  }
+  return banNumber % 2 === 1
     ? `${team1} is banning a leader`
     : `${team2} is banning a leader`;
 };
@@ -27,11 +34,13 @@ type TeamHeadersProps = {
   team1: string;
   team2: string;
   currentStatus: `${"PICK" | "BAN" | "MAPBAN"}${number}`;
+  numberOfBansFirstRotation: number;
 };
 export const TeamHeaders = ({
   team1,
   team2,
   currentStatus,
+  numberOfBansFirstRotation,
 }: TeamHeadersProps) => {
   const teamSelecting = useMemo<"TEAM1" | "TEAM2" | undefined>(() => {
     const statusNumber = Number(currentStatus.slice(-1));
@@ -44,8 +53,9 @@ export const TeamHeaders = ({
   }, [currentStatus]);
 
   const status = useMemo<string | undefined>(
-    () => getDraftStatus(team1, team2, currentStatus),
-    [currentStatus, team1, team2],
+    () =>
+      getDraftStatus(team1, team2, currentStatus, numberOfBansFirstRotation),
+    [currentStatus, team1, team2, numberOfBansFirstRotation],
   );
 
   return (

@@ -118,6 +118,7 @@ export default function CompletedMapsPage({
             team1={lobby.team1.name ?? "Team 1"}
             team2={lobby.team2.name ?? "Team 2"}
             currentStatus={`${lobby.draftStatus.type}${lobby.draftStatus.index}`}
+            numberOfBansFirstRotation={lobby.numberOfBansFirstRotation}
           />
         )}
       </div>
