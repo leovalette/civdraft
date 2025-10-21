@@ -38,6 +38,17 @@ export default function DraftMapsPage({
 
   const [search, setSearch] = useState<string>("");
 
+  const [timerTimestamp, setTimerTimestamp] = useState<Date>(() =>
+    lobby?.leaderBanTimestamp ? new Date(lobby.leaderBanTimestamp) : new Date(),
+  );
+
+  useEffect(() => {
+    if (!lobby) return;
+    if (lobby.leaderBanTimestamp) {
+      setTimerTimestamp(new Date(lobby.leaderBanTimestamp));
+    }
+  }, [lobby?.leaderBanTimestamp, lobby]);
+
   const team1SelectedLeaders = useMemo(() => {
     if (!lobby || !leaders) {
       return [];
@@ -230,7 +241,7 @@ export default function DraftMapsPage({
               <Search value={search} setValue={setSearch} />
             </div>
             <div className="flex justify-between gap-6 sm:scale-75 md:scale-75 lg:scale-75">
-              <Timer timestamp={new Date()} timerDuration={60} />
+              <Timer timestamp={timerTimestamp} timerDuration={60} />
             </div>
           </div>
           <div className="flex h-4/5 flex-wrap justify-center gap-4 overflow-y-scroll">

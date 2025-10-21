@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
-import { use, useCallback, useEffect, useMemo } from "react";
+import { use, useCallback, useEffect, useMemo, useState } from "react";
 import { Chat } from "@/components/chat/Chat";
 import { DraftActions } from "@/components/DraftActions";
 import { LeaderOrMap } from "@/components/Leader";
@@ -33,6 +33,17 @@ export default function DraftMapsPage({
   const pseudo = getUserPseudo();
 
   const currentTeam = useMemo(() => lobby?.currentTeamTurn ?? 1, [lobby]);
+
+  const [timerTimestamp, setTimerTimestamp] = useState<Date>(() =>
+    lobby?.mapBanTimestamp ? new Date(lobby.mapBanTimestamp) : new Date(),
+  );
+
+  useEffect(() => {
+    if (!lobby) return;
+    if (lobby.mapBanTimestamp) {
+      setTimerTimestamp(new Date(lobby.mapBanTimestamp));
+    }
+  }, [lobby?.mapBanTimestamp, lobby]);
 
   const team1BannedMaps = useMemo(() => {
     if (!lobby || !allMaps) {
@@ -171,7 +182,7 @@ export default function DraftMapsPage({
         <div className="flex-1">
           <div className="flex items-center">
             <div className="flex justify-between gap-6 sm:scale-75 md:scale-75 lg:scale-75">
-              <Timer timestamp={new Date()} timerDuration={60} />
+              <Timer timestamp={timerTimestamp} timerDuration={60} />
             </div>
           </div>
           <div className="flex h-4/5 flex-wrap justify-center gap-4 overflow-y-scroll">
