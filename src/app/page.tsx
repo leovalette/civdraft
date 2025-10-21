@@ -5,6 +5,7 @@ import { useMutation, useQuery } from "convex/react";
 import { Github } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
+import { useLeadersMaps } from "@/app/LeadersMapsProvider";
 import { CivPrimaryButton } from "@/components/CivPrimaryButton";
 import { Input } from "@/components/home/Input";
 import { SelectAutobans } from "@/components/home/SelectAutoBans";
@@ -17,9 +18,8 @@ import type { Id } from "../../convex/_generated/dataModel";
 
 export default function Home() {
   const { userId } = useAuth();
-  const leaders = useQuery(api.leaders.get);
+  const { leaders, maps } = useLeadersMaps();
   const presets = useQuery(api.presets.get);
-  const maps = useQuery(api.maps.getAll);
   const createLobby = useMutation(api.lobbies.create);
   const router = useRouter();
 

@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery } from "convex/react";
 import { useMemo, useState } from "react";
+import { useLeadersMaps } from "@/app/LeadersMapsProvider";
 import { SelectAutobans } from "@/components/home/SelectAutoBans";
 import { SelectMaps } from "@/components/home/SelectMaps";
 import { api } from "../../../convex/_generated/api";
@@ -17,11 +18,10 @@ interface PresetFormData {
 
 export function PresetManager() {
   const presets = useQuery(api.presets.get);
-  const leaders = useQuery(api.leaders.get);
-  const maps = useQuery(api.maps.getAll);
   const createPreset = useMutation(api.presets.create);
   const updatePreset = useMutation(api.presets.update);
   const deletePresetMutation = useMutation(api.presets.deletePreset);
+  const { leaders, maps } = useLeadersMaps();
 
   const [editingPresetId, setEditingPresetId] = useState<Id<"presets"> | null>(
     null,

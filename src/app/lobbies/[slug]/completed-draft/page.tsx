@@ -4,6 +4,7 @@ import { useQuery } from "convex/react";
 import Image from "next/image";
 import router from "next/router";
 import { use, useCallback, useEffect, useMemo } from "react";
+import { useLeadersMaps } from "@/app/LeadersMapsProvider";
 import { Bans } from "@/components/bans/Bans";
 import { CivPrimaryButton } from "@/components/CivPrimaryButton";
 import { TeamHeaders } from "@/components/TeamHeaders";
@@ -18,8 +19,7 @@ export default function CompletedMapsPage({
 }) {
   const { slug: lobbyId } = use(params);
   const lobby = useQuery(api.lobbies.get, { lobbyId });
-  const leaders = useQuery(api.leaders.get);
-  const maps = useQuery(api.maps.getAll);
+  const { leaders, maps } = useLeadersMaps();
 
   const team1SelectedLeaders = useMemo(
     () =>

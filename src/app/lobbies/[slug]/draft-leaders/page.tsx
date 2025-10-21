@@ -4,6 +4,7 @@ import { useMutation, useQuery } from "convex/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { use, useCallback, useEffect, useMemo, useState } from "react";
+import { useLeadersMaps } from "@/app/LeadersMapsProvider";
 import { Bans } from "@/components/bans/Bans";
 import { Chat } from "@/components/chat/Chat";
 import { DraftActions } from "@/components/DraftActions";
@@ -24,9 +25,8 @@ export default function DraftMapsPage({
   const router = useRouter();
   const { slug: lobbyId } = use(params);
   const lobby = useQuery(api.lobbies.get, { lobbyId });
-  const leaders = useQuery(api.leaders.get);
+  const { leaders, maps } = useLeadersMaps();
   const pickBanLeader = useMutation(api.leaders.pickBanLeader);
-  const maps = useQuery(api.maps.getAll);
   const chat = useQuery(api.chat.get, { lobbyId });
   const postMessage = useMutation(api.chat.post);
   const selectedLeaderId = useQuery(api.currentSelection.get, { lobbyId });

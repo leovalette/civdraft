@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { use, useCallback, useEffect, useMemo, useState } from "react";
 import { EditText, type onSaveProps } from "react-edit-text";
 import { Tooltip } from "react-tooltip";
+import { useLeadersMaps } from "@/app/LeadersMapsProvider";
 import { CivPrimaryButton } from "@/components/CivPrimaryButton";
 import { getUserId, getUserPseudo } from "@/lib/user";
 import { api } from "../../../../convex/_generated/api";
@@ -19,8 +20,7 @@ export default function LobbyPage({
   const { slug: lobbyId } = use(params);
   const router = useRouter();
   const lobby = useQuery(api.lobbies.get, { lobbyId });
-  const leaders = useQuery(api.leaders.get);
-  const maps = useQuery(api.maps.getAll);
+  const { leaders, maps } = useLeadersMaps();
 
   const joinObservers = useMutation(api.lobbies.joinObservers);
   const joinTeam1 = useMutation(api.lobbies.joinTeam1);
