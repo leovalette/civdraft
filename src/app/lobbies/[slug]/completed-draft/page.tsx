@@ -183,7 +183,7 @@ export default function CompletedMapsPage({
               />
               <Bans
                 numberOfBans={lobby.numberOfBansSecondRotation / 2}
-                bans={team1BannedLeaders.reverse().map((ban) => ({
+                bans={[...team1BannedLeaders].reverse().map((ban) => ({
                   name: ban!.name,
                   src: ban!.imageName,
                 }))}
@@ -204,7 +204,7 @@ export default function CompletedMapsPage({
               />
               <Bans
                 numberOfBans={lobby.numberOfBansSecondRotation / 2}
-                bans={team2BannedLeaders.reverse().map((ban) => ({
+                bans={[...team2BannedLeaders].reverse().map((ban) => ({
                   name: ban!.name,
                   src: ban!.imageName,
                 }))}
