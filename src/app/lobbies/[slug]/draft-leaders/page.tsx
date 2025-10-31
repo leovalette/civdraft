@@ -31,7 +31,7 @@ export default function DraftMapsPage({
   const chat = useQuery(api.lobbyData.getChat, { lobbyId }) ?? [];
   const selectedLeaderId = useQuery(api.lobbyData.getCurrentSelection, { lobbyId });
   
-  const { leaders, maps } = useLeadersMaps();
+  const { leaders, leadersById, mapsById } = useLeadersMaps();
   const pickBanLeader = useMutation(api.leaders.pickBanLeader);
   const postMessage = useMutation(api.chat.post);
   const setSelectedLeaderId = useMutation(api.currentSelection.set);
@@ -54,76 +54,72 @@ export default function DraftMapsPage({
   }, [lobby?.leaderBanTimestamp, lobby]);
 
   const team1SelectedLeaders = useMemo(() => {
-    if (!lobby || !leaders) {
+    if (!lobby || !leadersById) {
       return [];
     }
-    return lobby.currentTeamTurn === 1 &&
-      lobby.draftStatus.type === "PICK" &&
-      selectedLeaderId
-      ? [
-          ...lobby.team1.selectedLeaders.map((leaderId) =>
-            leaders.find((leader) => leader.id === leaderId),
-          ),
-          leaders.find((leader) => leader.id === selectedLeaderId),
-        ].filter((leader) => leader !== undefined)
-      : lobby.team1.selectedLeaders
-          .map((leaderId) => leaders.find((leader) => leader.id === leaderId))
-          .filter((leader) => leader !== undefined);
-  }, [leaders, lobby, selectedLeaderId]);
+    const selectedLeaders = lobby.team1.selectedLeaders
+      .map((leaderId) => leadersById.get(leaderId))
+      .filter((leader): leader is NonNullable<typeof leader> => leader !== undefined);
+    
+    if (lobby.currentTeamTurn === 1 && lobby.draftStatus.type === "PICK" && selectedLeaderId) {
+      const currentlySelected = leadersById.get(selectedLeaderId);
+      if (currentlySelected) {
+        return [...selectedLeaders, currentlySelected];
+      }
+    }
+    return selectedLeaders;
+  }, [leadersById, lobby, selectedLeaderId]);
 
   const team2SelectedLeaders = useMemo(() => {
-    if (!lobby || !leaders) {
+    if (!lobby || !leadersById) {
       return [];
     }
-    return lobby.currentTeamTurn === 2 &&
-      lobby.draftStatus.type === "PICK" &&
-      selectedLeaderId
-      ? [
-          ...lobby.team2.selectedLeaders.map((leaderId) =>
-            leaders.find((leader) => leader.id === leaderId),
-          ),
-          leaders.find((leader) => leader.id === selectedLeaderId),
-        ].filter((leader) => leader !== undefined)
-      : lobby.team2.selectedLeaders
-          .map((leaderId) => leaders.find((leader) => leader.id === leaderId))
-          .filter((leader) => leader !== undefined);
-  }, [leaders, lobby, selectedLeaderId]);
+    const selectedLeaders = lobby.team2.selectedLeaders
+      .map((leaderId) => leadersById.get(leaderId))
+      .filter((leader): leader is NonNullable<typeof leader> => leader !== undefined);
+    
+    if (lobby.currentTeamTurn === 2 && lobby.draftStatus.type === "PICK" && selectedLeaderId) {
+      const currentlySelected = leadersById.get(selectedLeaderId);
+      if (currentlySelected) {
+        return [...selectedLeaders, currentlySelected];
+      }
+    }
+    return selectedLeaders;
+  }, [leadersById, lobby, selectedLeaderId]);
 
   const team1BannedLeaders = useMemo(() => {
-    if (!lobby || !leaders) {
+    if (!lobby || !leadersById) {
       return [];
     }
-    return lobby.currentTeamTurn === 1 &&
-      lobby.draftStatus.type === "BAN" &&
-      selectedLeaderId
-      ? [
-          ...lobby.team1.bannedLeaders.map((leaderId) =>
-            leaders.find((leader) => leader.id === leaderId),
-          ),
-          leaders.find((leader) => leader.id === selectedLeaderId),
-        ].filter((leader) => leader !== undefined)
-      : lobby.team1.bannedLeaders
-          .map((leaderId) => leaders.find((leader) => leader.id === leaderId))
-          .filter((leader) => leader !== undefined);
-  }, [leaders, lobby, selectedLeaderId]);
+    const bannedLeaders = lobby.team1.bannedLeaders
+      .map((leaderId) => leadersById.get(leaderId))
+      .filter((leader): leader is NonNullable<typeof leader> => leader !== undefined);
+    
+    if (lobby.currentTeamTurn === 1 && lobby.draftStatus.type === "BAN" && selectedLeaderId) {
+      const currentlySelected = leadersById.get(selectedLeaderId);
+      if (currentlySelected) {
+        return [...bannedLeaders, currentlySelected];
+      }
+    }
+    return bannedLeaders;
+  }, [leadersById, lobby, selectedLeaderId]);
 
   const team2BannedLeaders = useMemo(() => {
-    if (!lobby || !leaders) {
+    if (!lobby || !leadersById) {
       return [];
     }
-    return lobby.currentTeamTurn === 2 &&
-      lobby.draftStatus.type === "BAN" &&
-      selectedLeaderId
-      ? [
-          ...lobby.team2.bannedLeaders.map((leaderId) =>
-            leaders.find((leader) => leader.id === leaderId),
-          ),
-          leaders.find((leader) => leader.id === selectedLeaderId),
-        ].filter((leader) => leader !== undefined)
-      : lobby.team2.bannedLeaders
-          .map((leaderId) => leaders.find((leader) => leader.id === leaderId))
-          .filter((leader) => leader !== undefined);
-  }, [leaders, lobby, selectedLeaderId]);
+    const bannedLeaders = lobby.team2.bannedLeaders
+      .map((leaderId) => leadersById.get(leaderId))
+      .filter((leader): leader is NonNullable<typeof leader> => leader !== undefined);
+    
+    if (lobby.currentTeamTurn === 2 && lobby.draftStatus.type === "BAN" && selectedLeaderId) {
+      const currentlySelected = leadersById.get(selectedLeaderId);
+      if (currentlySelected) {
+        return [...bannedLeaders, currentlySelected];
+      }
+    }
+    return bannedLeaders;
+  }, [leadersById, lobby, selectedLeaderId]);
 
   const numberOfPicks = useMemo(() => {
     if (!lobby) {
@@ -163,8 +159,9 @@ export default function DraftMapsPage({
   );
 
   const selectedMap = useMemo(() => {
-    return maps?.find((map) => map.id === lobby?.selectedMapId);
-  }, [maps, lobby]);
+    if (!lobby?.selectedMapId) return undefined;
+    return mapsById.get(lobby.selectedMapId);
+  }, [mapsById, lobby]);
 
   const handleConfirm = async () => {
     if (!selectedLeaderId) return;

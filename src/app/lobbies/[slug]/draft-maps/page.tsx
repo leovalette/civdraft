@@ -28,7 +28,7 @@ export default function DraftMapsPage({
   const chat = useQuery(api.lobbyData.getChat, { lobbyId }) ?? [];
   const selectedMapId = useQuery(api.lobbyData.getCurrentSelection, { lobbyId });
   
-  const { maps: allMaps } = useLeadersMaps();
+  const { maps: allMaps, mapsById } = useLeadersMaps();
   const banMap = useMutation(api.mapDraft.banMap);
   const postMessage = useMutation(api.chat.post);
   const setSelectedMapId = useMutation(api.currentSelection.set);
@@ -51,37 +51,40 @@ export default function DraftMapsPage({
   }, [lobby?.mapBanTimestamp, lobby]);
 
   const team1BannedMaps = useMemo(() => {
-    if (!lobby || !allMaps) {
+    if (!lobby || !mapsById) {
       return [];
     }
 
-    return lobby.currentTeamTurn === 1 && selectedMapId
-      ? [
-          ...lobby.team1.bannedMaps.map((mapId) =>
-            allMaps.find((map) => map.id === mapId),
-          ),
-          allMaps.find((map) => map.id === selectedMapId),
-        ].filter((map) => map !== undefined)
-      : lobby.team1.bannedMaps
-          .map((mapId) => allMaps.find((map) => map.id === mapId))
-          .filter((map) => map !== undefined);
-  }, [allMaps, lobby, selectedMapId]);
+    const bannedMaps = lobby.team1.bannedMaps
+      .map((mapId) => mapsById.get(mapId))
+      .filter((map): map is NonNullable<typeof map> => map !== undefined);
+
+    if (lobby.currentTeamTurn === 1 && selectedMapId) {
+      const currentlySelected = mapsById.get(selectedMapId);
+      if (currentlySelected) {
+        return [...bannedMaps, currentlySelected];
+      }
+    }
+    return bannedMaps;
+  }, [mapsById, lobby, selectedMapId]);
 
   const team2BannedMaps = useMemo(() => {
-    if (!lobby || !allMaps) {
+    if (!lobby || !mapsById) {
       return [];
     }
-    return lobby.currentTeamTurn === 2 && selectedMapId
-      ? [
-          ...lobby.team2.bannedMaps.map((mapId) =>
-            allMaps.find((map) => map.id === mapId),
-          ),
-          allMaps.find((map) => map.id === selectedMapId),
-        ].filter((map) => map !== undefined)
-      : lobby.team2.bannedMaps
-          .map((mapId) => allMaps.find((map) => map.id === mapId))
-          .filter((map) => map !== undefined);
-  }, [allMaps, lobby, selectedMapId]);
+    
+    const bannedMaps = lobby.team2.bannedMaps
+      .map((mapId) => mapsById.get(mapId))
+      .filter((map): map is NonNullable<typeof map> => map !== undefined);
+
+    if (lobby.currentTeamTurn === 2 && selectedMapId) {
+      const currentlySelected = mapsById.get(selectedMapId);
+      if (currentlySelected) {
+        return [...bannedMaps, currentlySelected];
+      }
+    }
+    return bannedMaps;
+  }, [mapsById, lobby, selectedMapId]);
 
   const isObserver = useMemo(
     () => lobby?.observers.some((observer) => observer.id === userId) ?? false,

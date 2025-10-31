@@ -54,45 +54,51 @@ export default function LobbyPage({
 
   const [userPseudo, setUserPseudo] = useState("");
   const [userId, setUserId] = useState("");
+  const [isJoining, setIsJoining] = useState(false);
+  const [isTogglingReady, setIsTogglingReady] = useState(false);
 
   const handleJoinTeam1 = useCallback(() => {
-    if (userId && userPseudo) {
+    if (userId && userPseudo && !isJoining) {
+      setIsJoining(true);
       joinTeam1({
         lobbyId,
         playerPseudo: userPseudo,
         playerId: userId,
-      });
+      }).finally(() => setIsJoining(false));
     }
-  }, [userId, userPseudo, lobbyId, joinTeam1]);
+  }, [userId, userPseudo, lobbyId, joinTeam1, isJoining]);
 
   const handleJoinTeam2 = useCallback(() => {
-    if (userId && userPseudo) {
+    if (userId && userPseudo && !isJoining) {
+      setIsJoining(true);
       joinTeam2({
         lobbyId,
         playerPseudo: userPseudo,
         playerId: userId,
-      });
+      }).finally(() => setIsJoining(false));
     }
-  }, [userId, userPseudo, lobbyId, joinTeam2]);
+  }, [userId, userPseudo, lobbyId, joinTeam2, isJoining]);
 
   const handleJoinObservers = useCallback(() => {
-    if (userId && userPseudo) {
+    if (userId && userPseudo && !isJoining) {
+      setIsJoining(true);
       joinObservers({
         lobbyId,
         playerPseudo: userPseudo,
         playerId: userId,
-      });
+      }).finally(() => setIsJoining(false));
     }
-  }, [userId, userPseudo, lobbyId, joinObservers]);
+  }, [userId, userPseudo, lobbyId, joinObservers, isJoining]);
 
   const handleToggleReady = useCallback(() => {
-    if (userId) {
+    if (userId && !isTogglingReady) {
+      setIsTogglingReady(true);
       toggleTeamReady({
         lobbyId,
         playerId: userId,
-      });
+      }).finally(() => setIsTogglingReady(false));
     }
-  }, [userId, lobbyId, toggleTeamReady]);
+  }, [userId, lobbyId, toggleTeamReady, isTogglingReady]);
 
   useEffect(() => {
     // Get or generate user identification on mount
@@ -105,7 +111,8 @@ export default function LobbyPage({
       playerPseudo: pseudo,
       playerId: id,
     });
-  }, [joinObservers, lobbyId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lobbyId]); // Only run once when lobbyId is set
 
   const getUrl = async () => {
     const url = window.location.href;
