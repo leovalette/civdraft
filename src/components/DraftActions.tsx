@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { CivPrimaryButton } from "./CivPrimaryButton";
 
 type DraftActionsProps = {
@@ -7,7 +8,7 @@ type DraftActionsProps = {
   isObserver: boolean;
   disabled?: boolean;
 };
-export const DraftActions = ({
+export const DraftActions = memo(({
   currentStatus,
   canPlay,
   onPickBan,
@@ -19,7 +20,9 @@ export const DraftActions = ({
       {canPlay ? getPhase(currentStatus) : getAction(isObserver)}
     </CivPrimaryButton>
   </div>
-);
+));
+
+DraftActions.displayName = "DraftActions";
 
 const getPhase = (
   currentStatus: `${"PICK" | "BAN" | "MAPBAN"}${number}`,

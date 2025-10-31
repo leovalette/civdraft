@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
   typescript: {
     tsconfigPath: "./tsconfig.json",
   },
+  images: {
+    formats: ["image/webp"],
+    qualities: [75, 90, 100],
+  },
 };
 
 export default nextConfig;

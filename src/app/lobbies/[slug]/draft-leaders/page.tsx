@@ -25,11 +25,11 @@ export default function DraftMapsPage({
   const router = useRouter();
   const { slug: lobbyId } = use(params);
   
-  // Single optimized query instead of 3 separate ones
-  const lobbyData = useQuery(api.lobbyData.getLobbyData, { lobbyId });
-  const lobby = lobbyData?.lobby;
-  const chat = lobbyData?.chat ?? [];
-  const selectedLeaderId = lobbyData?.currentSelection;
+  // Use separate queries to minimize re-renders
+  // Lobby state changes won't re-render chat, and vice versa
+  const lobby = useQuery(api.lobbyData.getLobby, { lobbyId });
+  const chat = useQuery(api.lobbyData.getChat, { lobbyId }) ?? [];
+  const selectedLeaderId = useQuery(api.lobbyData.getCurrentSelection, { lobbyId });
   
   const { leaders, maps } = useLeadersMaps();
   const pickBanLeader = useMutation(api.leaders.pickBanLeader);
@@ -169,8 +169,9 @@ export default function DraftMapsPage({
   const handleConfirm = async () => {
     if (!selectedLeaderId) return;
 
-    // Optimistic update: Clear selection immediately for instant UI feedback
     const leaderIdToSubmit = selectedLeaderId;
+    
+    // Clear selection for ALL users immediately (optimistic)
     clearSelectedLeaderId({ lobbyId });
 
     try {
@@ -181,8 +182,8 @@ export default function DraftMapsPage({
       });
     } catch (error) {
       console.error("Error banning leader:", error);
-      // On error, you could optionally re-set the selection
-      // setSelectedLeaderId({ lobbyId, selectionId: leaderIdToSubmit });
+      // On error, restore the selection for everyone
+      setSelectedLeaderId({ lobbyId, selectionId: leaderIdToSubmit });
     }
   };
 

@@ -22,11 +22,11 @@ export default function DraftMapsPage({
   const router = useRouter();
   const { slug: lobbyId } = use(params);
   
-  // Single optimized query instead of 3 separate ones
-  const lobbyData = useQuery(api.lobbyData.getLobbyData, { lobbyId });
-  const lobby = lobbyData?.lobby;
-  const chat = lobbyData?.chat ?? [];
-  const selectedMapId = lobbyData?.currentSelection;
+  // Use separate queries to minimize re-renders
+  // Lobby state changes won't re-render chat, and vice versa
+  const lobby = useQuery(api.lobbyData.getLobby, { lobbyId });
+  const chat = useQuery(api.lobbyData.getChat, { lobbyId }) ?? [];
+  const selectedMapId = useQuery(api.lobbyData.getCurrentSelection, { lobbyId });
   
   const { maps: allMaps } = useLeadersMaps();
   const banMap = useMutation(api.mapDraft.banMap);
@@ -99,8 +99,9 @@ export default function DraftMapsPage({
   const handleConfirm = async () => {
     if (!selectedMapId) return;
 
-    // Optimistic update: Clear selection immediately for instant UI feedback
     const mapIdToSubmit = selectedMapId;
+    
+    // Clear selection for ALL users immediately (optimistic)
     clearSelectedMapId({ lobbyId });
 
     try {
@@ -111,8 +112,8 @@ export default function DraftMapsPage({
       });
     } catch (error) {
       console.error("Error banning map:", error);
-      // On error, you could optionally re-set the selection
-      // setSelectedMapId({ lobbyId, selectionId: mapIdToSubmit });
+      // On error, restore the selection for everyone
+      setSelectedMapId({ lobbyId, selectionId: mapIdToSubmit });
     }
   };
 

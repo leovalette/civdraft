@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 
 const getDraftStatus = (
   team1: string,
@@ -36,7 +36,7 @@ type TeamHeadersProps = {
   currentStatus: `${"PICK" | "BAN" | "MAPBAN"}${number}`;
   numberOfBansFirstRotation: number;
 };
-export const TeamHeaders = ({
+export const TeamHeaders = memo(({
   team1,
   team2,
   currentStatus,
@@ -81,4 +81,6 @@ export const TeamHeaders = ({
       </div>
     </div>
   );
-};
+});
+
+TeamHeaders.displayName = "TeamHeaders";

@@ -1,11 +1,11 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, memo } from "react";
 
 type ChatProps = {
   messages: { pseudo: string; message: string }[];
   postMessage: (message: string) => void;
 };
 
-export const Chat = ({ messages, postMessage }: ChatProps) => {
+export const Chat = memo(({ messages, postMessage }: ChatProps) => {
   const chatRef = useRef<HTMLUListElement>(null);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -54,4 +54,6 @@ export const Chat = ({ messages, postMessage }: ChatProps) => {
       </form>
     </div>
   );
-};
+});
+
+Chat.displayName = "Chat";
