@@ -6,7 +6,7 @@ const filterOptions = (
   candidate: {
     label: string;
     value: string;
-    data: { name: string; src: string; _id: string };
+    data: { name: string; src: string; id: string };
   },
   search: string,
 ) => {
@@ -14,11 +14,11 @@ const filterOptions = (
 };
 
 type Props = {
-  selectedMaps: { name: string; src: string; _id: string }[];
+  selectedMaps: { name: string; src: string; id: string }[];
   setSelectedMaps: (
-    selectedMaps: { name: string; src: string; _id: string }[],
+    selectedMaps: { name: string; src: string; id: string }[],
   ) => void;
-  maps: { name: string; src: string; _id: string }[];
+  maps: { name: string; src: string; id: string }[];
 };
 
 export const SelectMaps: FC<Props> = ({
@@ -34,9 +34,9 @@ export const SelectMaps: FC<Props> = ({
       placeholder="Select map"
       value={selectedMaps}
       onChange={(
-        map: MultiValue<{ name: string; src: string; _id: string }>,
+        map: MultiValue<{ name: string; src: string; id: string }>,
       ) => {
-        setSelectedMaps(map as { name: string; src: string; _id: string }[]);
+        setSelectedMaps(map as { name: string; src: string; id: string }[]);
       }}
       formatOptionLabel={(map) => (
         <LeaderOrMapSelectFormatOption leaderOrMap={map} type="maps" />

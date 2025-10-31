@@ -26,8 +26,8 @@ export const getById = query({
 export const create = mutation({
   args: {
     name: v.string(),
-    mapIds: v.array(v.id("maps")),
-    autoBannedLeaderIds: v.array(v.id("leaders")),
+    mapIds: v.array(v.string()),
+    autoBannedLeaderIds: v.array(v.string()),
     numberOfBansFirstRotation: v.number(),
     numberOfBansSecondRotation: v.number(),
   },
@@ -78,8 +78,8 @@ export const update = mutation({
   args: {
     presetId: v.id("presets"),
     name: v.string(),
-    mapIds: v.array(v.id("maps")),
-    autoBannedLeaderIds: v.array(v.id("leaders")),
+    mapIds: v.array(v.string()),
+    autoBannedLeaderIds: v.array(v.string()),
     numberOfBansFirstRotation: v.number(),
     numberOfBansSecondRotation: v.number(),
   },

@@ -14,7 +14,6 @@ import { SelectMode } from "@/components/home/SelectMode";
 import { useIsAdmin } from "@/hooks/useAdmin";
 import { setUserPseudo } from "@/lib/user";
 import { api } from "../../convex/_generated/api";
-import type { Id } from "../../convex/_generated/dataModel";
 
 export default function Home() {
   const { userId } = useAuth();
@@ -27,21 +26,20 @@ export default function Home() {
   const [team1, setTeam1] = useState<string>("Team 1");
   const [team2, setTeam2] = useState<string>("Team 2");
   const [selectedMaps, setSelectedMaps] = useState<
-    { name: string; src: string; _id: string }[]
+    { name: string; src: string; id: string }[]
   >([]);
   const [banCivs, setBanCivs] = useState<
-    { name: string; _id: string; src: string }[]
+    { name: string; id: string; src: string }[]
   >([]);
   const [preset, setPreset] = useState<{ id: string; label: string } | null>(
     null,
   );
 
-  const bannableLeaders = useMemo<{ name: string; src: string; _id: string }[]>(
+  const bannableLeaders = useMemo<{ name: string; src: string; id: string }[]>(
     () =>
       leaders
         ?.filter(({ name }) => name !== "TIMEOUT")
-        .map(({ name, imageName, _id }) => ({ name, src: imageName, _id })) ??
-      [],
+        .map(({ name, imageName, id }) => ({ name, src: imageName, id })) ?? [],
     [leaders],
   );
 
@@ -53,8 +51,8 @@ export default function Home() {
       const selectedPreset = presets?.find((m) => m._id === e?.presetId);
       if (selectedPreset && maps) {
         const presetMaps = maps
-          .filter((map) => selectedPreset.mapIds.includes(map._id))
-          .map(({ name, imageName, _id }) => ({ name, src: imageName, _id }));
+          .filter((map) => selectedPreset.mapIds.includes(map.id))
+          .map(({ name, imageName, id }) => ({ name, src: imageName, id }));
 
         setSelectedMaps(presetMaps);
       } else {
@@ -78,13 +76,13 @@ export default function Home() {
       const lobbyId = await createLobby({
         team1Name: team1 || "Team 1",
         team2Name: team2 || "Team 2",
-        autoBannedLeaderIds: banCivs.map(({ _id }) => _id as Id<"leaders">),
+        autoBannedLeaderIds: banCivs.map(({ id }) => id),
         numberOfBansFirstRotation: selectedPreset?.numberOfBansFirstRotation,
         numberOfBansSecondRotation: selectedPreset?.numberOfBansSecondRotation,
         numberOfPicksFirstRotation: selectedPreset?.numberOfPicksFirstRotation,
         numberOfPicksSecondRotation:
           selectedPreset?.numberOfPicksSecondRotation,
-        mapIds: selectedMaps.map(({ _id }) => _id as Id<"maps">),
+        mapIds: selectedMaps.map(({ id }) => id),
         mapDraft: selectedMaps.length > 0,
       });
 
@@ -172,10 +170,10 @@ export default function Home() {
             maps={
               maps
                 ?.filter(({ name }) => name !== "TIMEOUT")
-                ?.map(({ name, imageName, _id }) => ({
+                ?.map(({ name, imageName, id }) => ({
                   name,
                   src: imageName,
-                  _id,
+                  id,
                 })) ?? []
             }
           />

@@ -54,12 +54,12 @@ export default function DraftMapsPage({
     return lobby.currentTeamTurn === 1 && selectedMapId
       ? [
           ...lobby.team1.bannedMaps.map((mapId) =>
-            allMaps.find((map) => map._id === mapId),
+            allMaps.find((map) => map.id === mapId),
           ),
-          allMaps.find((map) => map._id === selectedMapId),
+          allMaps.find((map) => map.id === selectedMapId),
         ].filter((map) => map !== undefined)
       : lobby.team1.bannedMaps
-          .map((mapId) => allMaps.find((map) => map._id === mapId))
+          .map((mapId) => allMaps.find((map) => map.id === mapId))
           .filter((map) => map !== undefined);
   }, [allMaps, lobby, selectedMapId]);
 
@@ -70,12 +70,12 @@ export default function DraftMapsPage({
     return lobby.currentTeamTurn === 2 && selectedMapId
       ? [
           ...lobby.team2.bannedMaps.map((mapId) =>
-            allMaps.find((map) => map._id === mapId),
+            allMaps.find((map) => map.id === mapId),
           ),
-          allMaps.find((map) => map._id === selectedMapId),
+          allMaps.find((map) => map.id === selectedMapId),
         ].filter((map) => map !== undefined)
       : lobby.team2.bannedMaps
-          .map((mapId) => allMaps.find((map) => map._id === mapId))
+          .map((mapId) => allMaps.find((map) => map.id === mapId))
           .filter((map) => map !== undefined);
   }, [allMaps, lobby, selectedMapId]);
 
@@ -98,7 +98,7 @@ export default function DraftMapsPage({
     try {
       await banMap({
         lobbyId,
-        mapId: selectedMapId as Id<"maps">,
+        mapId: selectedMapId,
         teamNumber: currentTeam,
       });
       clearSelectedMapId({ lobbyId });
@@ -113,7 +113,7 @@ export default function DraftMapsPage({
     }
     return lobby.mapIds.length === 0
       ? allMaps
-      : allMaps.filter((map) => lobby.mapIds.includes(map._id));
+      : allMaps.filter((map) => lobby.mapIds.includes(map.id));
   }, [lobby, allMaps]);
 
   const filteredMaps = useMemo(() => {
@@ -121,8 +121,7 @@ export default function DraftMapsPage({
       return [];
     }
     return (
-      availableMaps?.filter((map) => !lobby.bannedMapIds.includes(map._id)) ??
-      []
+      availableMaps?.filter((map) => !lobby.bannedMapIds.includes(map.id)) ?? []
     );
   }, [lobby, availableMaps]);
 
@@ -161,7 +160,7 @@ export default function DraftMapsPage({
             <TeamSelection
               leaderOrMaps={
                 team1BannedMaps?.map((map) => ({
-                  id: map!._id,
+                  id: map!.id,
                   name: map!.name,
                   imageName: map!.imageName,
                   type: "map",
@@ -189,9 +188,9 @@ export default function DraftMapsPage({
           <div className="flex h-4/5 flex-wrap justify-center gap-4 overflow-y-scroll">
             {filteredMaps.map((map) => (
               <LeaderOrMap
-                key={map._id}
+                key={map.id}
                 leaderOrMap={{
-                  id: map._id,
+                  id: map.id,
                   name: map.name,
                   imageName: map.imageName,
                   pickBanType: "AVAILABLE",
@@ -199,7 +198,7 @@ export default function DraftMapsPage({
                 type="map"
                 onClick={() => {
                   if (canPlay) {
-                    setSelectedMapId({ lobbyId, selectionId: map._id });
+                    setSelectedMapId({ lobbyId, selectionId: map.id });
                   }
                 }}
               />
@@ -211,7 +210,7 @@ export default function DraftMapsPage({
             <TeamSelection
               leaderOrMaps={
                 team2BannedMaps?.map((map) => ({
-                  id: map!._id,
+                  id: map!.id,
                   name: map!.name,
                   imageName: map!.imageName,
                   type: "map",

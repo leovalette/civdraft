@@ -58,12 +58,12 @@ export default function DraftMapsPage({
       selectedLeaderId
       ? [
           ...lobby.team1.selectedLeaders.map((leaderId) =>
-            leaders.find((leader) => leader._id === leaderId),
+            leaders.find((leader) => leader.id === leaderId),
           ),
-          leaders.find((leader) => leader._id === selectedLeaderId),
+          leaders.find((leader) => leader.id === selectedLeaderId),
         ].filter((leader) => leader !== undefined)
       : lobby.team1.selectedLeaders
-          .map((leaderId) => leaders.find((leader) => leader._id === leaderId))
+          .map((leaderId) => leaders.find((leader) => leader.id === leaderId))
           .filter((leader) => leader !== undefined);
   }, [leaders, lobby, selectedLeaderId]);
 
@@ -76,12 +76,12 @@ export default function DraftMapsPage({
       selectedLeaderId
       ? [
           ...lobby.team2.selectedLeaders.map((leaderId) =>
-            leaders.find((leader) => leader._id === leaderId),
+            leaders.find((leader) => leader.id === leaderId),
           ),
-          leaders.find((leader) => leader._id === selectedLeaderId),
+          leaders.find((leader) => leader.id === selectedLeaderId),
         ].filter((leader) => leader !== undefined)
       : lobby.team2.selectedLeaders
-          .map((leaderId) => leaders.find((leader) => leader._id === leaderId))
+          .map((leaderId) => leaders.find((leader) => leader.id === leaderId))
           .filter((leader) => leader !== undefined);
   }, [leaders, lobby, selectedLeaderId]);
 
@@ -94,12 +94,12 @@ export default function DraftMapsPage({
       selectedLeaderId
       ? [
           ...lobby.team1.bannedLeaders.map((leaderId) =>
-            leaders.find((leader) => leader._id === leaderId),
+            leaders.find((leader) => leader.id === leaderId),
           ),
-          leaders.find((leader) => leader._id === selectedLeaderId),
+          leaders.find((leader) => leader.id === selectedLeaderId),
         ].filter((leader) => leader !== undefined)
       : lobby.team1.bannedLeaders
-          .map((leaderId) => leaders.find((leader) => leader._id === leaderId))
+          .map((leaderId) => leaders.find((leader) => leader.id === leaderId))
           .filter((leader) => leader !== undefined);
   }, [leaders, lobby, selectedLeaderId]);
 
@@ -112,12 +112,12 @@ export default function DraftMapsPage({
       selectedLeaderId
       ? [
           ...lobby.team2.bannedLeaders.map((leaderId) =>
-            leaders.find((leader) => leader._id === leaderId),
+            leaders.find((leader) => leader.id === leaderId),
           ),
-          leaders.find((leader) => leader._id === selectedLeaderId),
+          leaders.find((leader) => leader.id === selectedLeaderId),
         ].filter((leader) => leader !== undefined)
       : lobby.team2.bannedLeaders
-          .map((leaderId) => leaders.find((leader) => leader._id === leaderId))
+          .map((leaderId) => leaders.find((leader) => leader.id === leaderId))
           .filter((leader) => leader !== undefined);
   }, [leaders, lobby, selectedLeaderId]);
 
@@ -159,7 +159,7 @@ export default function DraftMapsPage({
   );
 
   const selectedMap = useMemo(() => {
-    return maps?.find((map) => map._id === lobby?.selectedMapId);
+    return maps?.find((map) => map.id === lobby?.selectedMapId);
   }, [maps, lobby]);
 
   const handleConfirm = async () => {
@@ -168,7 +168,7 @@ export default function DraftMapsPage({
     try {
       await pickBanLeader({
         lobbyId,
-        leaderId: selectedLeaderId as Id<"leaders">,
+        leaderId: selectedLeaderId,
         teamNumber: currentTeam,
       });
       clearSelectedLeaderId({ lobbyId });
@@ -213,7 +213,7 @@ export default function DraftMapsPage({
               <TeamSelection
                 leaderOrMaps={
                   team1SelectedLeaders.map((leader) => ({
-                    id: leader!._id,
+                    id: leader!.id,
                     name: leader!.name,
                     imageName: leader!.imageName,
                     type: "leader",
@@ -247,27 +247,27 @@ export default function DraftMapsPage({
           <div className="flex h-4/5 flex-wrap justify-center gap-4 overflow-y-scroll">
             {filteredLeaders.map((leader) => (
               <LeaderOrMap
-                key={leader._id}
+                key={leader.id}
                 leaderOrMap={{
-                  id: leader._id,
+                  id: leader.id,
                   name: leader.name,
                   imageName: leader.imageName,
-                  pickBanType: lobby?.team1.bannedLeaders.includes(leader._id)
+                  pickBanType: lobby?.team1.bannedLeaders.includes(leader.id)
                     ? "BANT1"
-                    : lobby?.team2.bannedLeaders.includes(leader._id)
+                    : lobby?.team2.bannedLeaders.includes(leader.id)
                       ? "BANT2"
-                      : lobby?.team1.selectedLeaders.includes(leader._id)
+                      : lobby?.team1.selectedLeaders.includes(leader.id)
                         ? "PICKT1"
-                        : lobby?.team2.selectedLeaders.includes(leader._id)
+                        : lobby?.team2.selectedLeaders.includes(leader.id)
                           ? "PICKT2"
-                          : lobby?.autoBannedLeaderIds.includes(leader._id)
+                          : lobby?.autoBannedLeaderIds.includes(leader.id)
                             ? "AUTOBAN"
                             : "AVAILABLE",
                 }}
                 type="leader"
                 onClick={() => {
                   if (canPlay) {
-                    setSelectedLeaderId({ lobbyId, selectionId: leader._id });
+                    setSelectedLeaderId({ lobbyId, selectionId: leader.id });
                   }
                 }}
               />
@@ -279,7 +279,7 @@ export default function DraftMapsPage({
             <TeamSelection
               leaderOrMaps={
                 team2SelectedLeaders.map((leader) => ({
-                  id: leader!._id,
+                  id: leader!.id,
                   name: leader!.name,
                   imageName: leader!.imageName,
                   type: "leader",

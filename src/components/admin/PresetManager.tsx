@@ -10,8 +10,8 @@ import type { Id } from "../../../convex/_generated/dataModel";
 
 interface PresetFormData {
   name: string;
-  selectedMaps: { name: string; src: string; _id: string }[];
-  selectedBans: { name: string; _id: string; src: string }[];
+  selectedMaps: { name: string; src: string; id: string }[];
+  selectedBans: { name: string; id: string; src: string }[];
   numberOfBansFirstRotation: number;
   numberOfBansSecondRotation: number;
 }
@@ -37,27 +37,27 @@ export function PresetManager() {
   const [error, setError] = useState<string | null>(null);
 
   // Get bannable leaders (exclude TIMEOUT)
-  const bannableLeaders = useMemo<{ name: string; src: string; _id: string }[]>(
+  const bannableLeaders = useMemo<{ name: string; src: string; id: string }[]>(
     () =>
       leaders
         ?.filter(({ name }) => name !== "TIMEOUT")
-        .map(({ name, imageName, _id }) => ({
+        .map(({ name, imageName, id }) => ({
           name,
           src: imageName,
-          _id,
+          id,
         })) ?? [],
     [leaders],
   );
 
   // Convert maps to format needed by SelectMaps
-  const mapsForSelect = useMemo<{ name: string; src: string; _id: string }[]>(
+  const mapsForSelect = useMemo<{ name: string; src: string; id: string }[]>(
     () =>
       maps
         ?.filter(({ name }) => name !== "TIMEOUT")
-        ?.map(({ name, imageName, _id }) => ({
+        ?.map(({ name, imageName, id }) => ({
           name,
           src: imageName,
-          _id,
+          id,
         })) ?? [],
     [maps],
   );
@@ -70,19 +70,19 @@ export function PresetManager() {
 
     const selectedMaps =
       maps
-        ?.filter((m) => preset.mapIds.includes(m._id))
-        .map(({ name, imageName, _id }) => ({
+        ?.filter((m) => preset.mapIds.includes(m.id))
+        .map(({ name, imageName, id }) => ({
           name,
           src: imageName,
-          _id,
+          id,
         })) ?? [];
 
     const selectedBans =
       leaders
-        ?.filter((l) => preset.autoBannedLeaderIds.includes(l._id))
-        .map(({ name, imageName, _id }) => ({
+        ?.filter((l) => preset.autoBannedLeaderIds.includes(l.id))
+        .map(({ name, imageName, id }) => ({
           name,
-          _id,
+          id,
           src: imageName,
         })) ?? [];
 
@@ -130,10 +130,8 @@ export function PresetManager() {
         await updatePreset({
           presetId: editingPresetId,
           name: formData.name,
-          mapIds: formData.selectedMaps.map((m) => m._id as Id<"maps">),
-          autoBannedLeaderIds: formData.selectedBans.map(
-            (b) => b._id as Id<"leaders">,
-          ),
+          mapIds: formData.selectedMaps.map((m) => m.id),
+          autoBannedLeaderIds: formData.selectedBans.map((b) => b.id),
           numberOfBansFirstRotation: formData.numberOfBansFirstRotation,
           numberOfBansSecondRotation: formData.numberOfBansSecondRotation,
         });
@@ -141,10 +139,8 @@ export function PresetManager() {
         // Create new preset
         await createPreset({
           name: formData.name,
-          mapIds: formData.selectedMaps.map((m) => m._id as Id<"maps">),
-          autoBannedLeaderIds: formData.selectedBans.map(
-            (b) => b._id as Id<"leaders">,
-          ),
+          mapIds: formData.selectedMaps.map((m) => m.id),
+          autoBannedLeaderIds: formData.selectedBans.map((b) => b.id),
           numberOfBansFirstRotation: formData.numberOfBansFirstRotation,
           numberOfBansSecondRotation: formData.numberOfBansSecondRotation,
         });

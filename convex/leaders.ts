@@ -1,22 +1,15 @@
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
-import { internalMutation, mutation, query } from "./_generated/server";
+import type { Id } from "./_generated/dataModel";
+import { internalMutation, mutation } from "./_generated/server";
 
 const LEADER_BAN_TIMEOUT_MS = 60 * 1000; // 1 minute
-const DEFAULT_AUTO_BAN_LEADER_ID_DEV = "jd7envq8gzesxynzex5pjvcx0d7s2x2a";
-const DEFAULT_AUTO_BAN_LEADER_ID_PROD = "j57fjx93m411nayke84bp9e4pd7spskp";
-
-export const get = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("leaders").collect();
-  },
-});
+const DEFAULT_AUTO_BAN_LEADER_ID = "j57fjx93m411nayke84bp9e4pd7spskp";
 
 export const pickBanLeader = mutation({
   args: {
     lobbyId: v.id("lobbies"),
-    leaderId: v.id("leaders"),
+    leaderId: v.string(),
     teamNumber: v.union(v.literal(1), v.literal(2)),
   },
   handler: async (ctx, { lobbyId, leaderId, teamNumber }) => {
@@ -26,7 +19,7 @@ export const pickBanLeader = mutation({
 
 async function performLeaderPickBan(
   ctx: any,
-  lobbyId: string,
+  lobbyId: Id<"lobbies">,
   leaderId: string,
   teamNumber: 1 | 2,
 ) {
@@ -164,7 +157,7 @@ export const checkLeaderBanTimeout = internalMutation({
     await performLeaderPickBan(
       ctx,
       lobbyId,
-      DEFAULT_AUTO_BAN_LEADER_ID_PROD,
+      DEFAULT_AUTO_BAN_LEADER_ID,
       getCurrentTeamTurn(lobby.draftStatus, lobby.numberOfBansFirstRotation),
     );
   },

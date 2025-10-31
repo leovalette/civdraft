@@ -7,7 +7,7 @@ const filterOptions = (
   candidate: {
     label: string;
     value: string;
-    data: { name: string; src: string; _id: string };
+    data: { name: string; src: string; id: string };
   },
   search: string,
 ) => {
@@ -15,9 +15,9 @@ const filterOptions = (
 };
 
 type Props = {
-  bannableLeaders: { name: string; src: string; _id: string }[];
-  bansCiv: { name: string; _id: string; src: string }[];
-  setBansCiv: (bansCiv: { name: string; _id: string; src: string }[]) => void;
+  bannableLeaders: { name: string; src: string; id: string }[];
+  bansCiv: { name: string; id: string; src: string }[];
+  setBansCiv: (bansCiv: { name: string; id: string; src: string }[]) => void;
 };
 export const SelectAutobans: FC<Props> = ({
   bansCiv,
@@ -34,9 +34,9 @@ export const SelectAutobans: FC<Props> = ({
       placeholder="Select ban"
       value={bansCiv}
       onChange={(
-        leader: MultiValue<{ name: string; _id: string; src: string }>,
+        leader: MultiValue<{ name: string; id: string; src: string }>,
       ) => {
-        setBansCiv(leader as { name: string; _id: string; src: string }[]);
+        setBansCiv(leader as { name: string; id: string; src: string }[]);
       }}
       isSearchable={true}
       formatOptionLabel={(leader) => (

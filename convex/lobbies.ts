@@ -1,17 +1,16 @@
 import { v } from "convex/values";
-import type { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 
 export const create = mutation({
   args: {
     team1Name: v.string(),
     team2Name: v.string(),
-    autoBannedLeaderIds: v.array(v.id("leaders")),
+    autoBannedLeaderIds: v.array(v.string()),
     numberOfBansFirstRotation: v.optional(v.number()),
     numberOfBansSecondRotation: v.optional(v.number()),
     numberOfPicksFirstRotation: v.optional(v.number()),
     numberOfPicksSecondRotation: v.optional(v.number()),
-    mapIds: v.optional(v.array(v.id("maps"))),
+    mapIds: v.optional(v.array(v.string())),
     mapDraft: v.boolean(),
   },
   handler: async (
@@ -28,12 +27,7 @@ export const create = mutation({
       mapDraft,
     },
   ) => {
-    const finalMapIds: Id<"maps">[] =
-      mapIds ??
-      (await ctx.db
-        .query("maps")
-        .collect()
-        .then((maps) => maps.map((m) => m._id)));
+    const finalMapIds: string[] = mapIds ?? [];
     return await ctx.db.insert("lobbies", {
       status: "LOBBY",
       team1: {

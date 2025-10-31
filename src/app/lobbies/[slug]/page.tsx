@@ -31,7 +31,7 @@ export default function LobbyPage({
   const autobans = useMemo(
     () =>
       leaders
-        ?.filter((leader) => lobby?.autoBannedLeaderIds.includes(leader._id))
+        ?.filter((leader) => lobby?.autoBannedLeaderIds.includes(leader.id))
         .map((leader) => ({
           name: leader.name,
           src: `/leaders/${leader.imageName}`,
@@ -42,7 +42,7 @@ export default function LobbyPage({
   const mapsToDraft = useMemo(
     () =>
       maps
-        ?.filter((map) => lobby?.mapIds.includes(map._id))
+        ?.filter((map) => lobby?.mapIds.includes(map.id))
         .map((map) => ({
           name: map.name,
           src: `/maps/${map.imageName}`,

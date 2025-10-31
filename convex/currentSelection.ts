@@ -17,7 +17,7 @@ export const get = query({
 export const set = mutation({
   args: {
     lobbyId: v.id("lobbies"),
-    selectionId: v.union(v.id("maps"), v.id("leaders")),
+    selectionId: v.string(),
   },
   handler: async (ctx, { lobbyId, selectionId }) => {
     const lobby = await ctx.db.get(lobbyId);

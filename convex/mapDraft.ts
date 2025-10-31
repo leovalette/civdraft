@@ -1,10 +1,10 @@
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
+import type { Id } from "./_generated/dataModel";
 import { internalMutation, mutation } from "./_generated/server";
 
 const MAP_BAN_TIMEOUT_MS = 60 * 1000; // 1 minute
-const DEFAULT_AUTO_BAN_MAP_ID_DEV = "jn7fecgcrpsn97x05hw81rk8z97sjwtw";
-const DEFAULT_AUTO_BAN_MAP_ID_PROD = "j974thpwrm9p782e0n9j9tnyv57spqrv";
+const DEFAULT_AUTO_BAN_MAP_ID = "j974thpwrm9p782e0n9j9tnyv57spqrv";
 
 export const startMapDraft = mutation({
   args: {
@@ -38,7 +38,7 @@ export const startMapDraft = mutation({
 export const banMap = mutation({
   args: {
     lobbyId: v.id("lobbies"),
-    mapId: v.id("maps"),
+    mapId: v.string(),
     teamNumber: v.union(v.literal(1), v.literal(2)),
   },
   handler: async (ctx, { lobbyId, mapId, teamNumber }) => {
@@ -48,7 +48,7 @@ export const banMap = mutation({
 
 async function performMapBan(
   ctx: any,
-  lobbyId: string,
+  lobbyId: Id<"lobbies">,
   mapId: string,
   teamNumber: 1 | 2,
 ) {
@@ -148,7 +148,7 @@ export const checkMapBanTimeout = internalMutation({
     await performMapBan(
       ctx,
       lobbyId,
-      DEFAULT_AUTO_BAN_MAP_ID_PROD,
+      DEFAULT_AUTO_BAN_MAP_ID,
       lobby.currentTeamTurn || 1,
     );
   },

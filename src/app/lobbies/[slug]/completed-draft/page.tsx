@@ -24,7 +24,7 @@ export default function CompletedMapsPage({
   const team1SelectedLeaders = useMemo(
     () =>
       lobby?.team1.selectedLeaders
-        .map((leaderId) => leaders?.find((leader) => leader._id === leaderId))
+        .map((leaderId) => leaders?.find((leader) => leader.id === leaderId))
         .filter((leader) => leader !== undefined) ?? [],
     [leaders, lobby],
   );
@@ -32,7 +32,7 @@ export default function CompletedMapsPage({
   const team2SelectedLeaders = useMemo(
     () =>
       lobby?.team2.selectedLeaders
-        .map((leaderId) => leaders?.find((leader) => leader._id === leaderId))
+        .map((leaderId) => leaders?.find((leader) => leader.id === leaderId))
         .filter((leader) => leader !== undefined) ?? [],
     [leaders, lobby],
   );
@@ -40,7 +40,7 @@ export default function CompletedMapsPage({
   const team1BannedLeaders = useMemo(
     () =>
       lobby?.team1.bannedLeaders
-        .map((leaderId) => leaders?.find((leader) => leader._id === leaderId))
+        .map((leaderId) => leaders?.find((leader) => leader.id === leaderId))
         .filter((leader) => leader !== undefined) ?? [],
     [leaders, lobby],
   );
@@ -48,7 +48,7 @@ export default function CompletedMapsPage({
   const team2BannedLeaders = useMemo(
     () =>
       lobby?.team2.bannedLeaders
-        .map((leaderId) => leaders?.find((leader) => leader._id === leaderId))
+        .map((leaderId) => leaders?.find((leader) => leader.id === leaderId))
         .filter((leader) => leader !== undefined) ?? [],
     [leaders, lobby],
   );
@@ -56,14 +56,14 @@ export default function CompletedMapsPage({
   const bannedMaps = useMemo(
     () =>
       lobby?.bannedMapIds
-        .map((mapId) => maps?.find((map) => map._id === mapId))
+        .map((mapId) => maps?.find((map) => map.id === mapId))
         .filter((map) => map !== undefined)
         .map((m) => m!.name) ?? [],
     [lobby, maps],
   );
 
   const selectedMap = useMemo(
-    () => maps?.find((map) => map._id === lobby?.selectedMapId),
+    () => maps?.find((map) => map.id === lobby?.selectedMapId),
     [maps, lobby],
   );
 
@@ -129,7 +129,7 @@ export default function CompletedMapsPage({
           <TeamSelection
             leaderOrMaps={
               team1SelectedLeaders.map((leader) => ({
-                id: leader!._id,
+                id: leader!.id,
                 name: leader!.name,
                 imageName: leader!.imageName,
                 type: "leader",
@@ -159,7 +159,7 @@ export default function CompletedMapsPage({
           <TeamSelection
             leaderOrMaps={
               team2SelectedLeaders.map((leader) => ({
-                id: leader!._id,
+                id: leader!.id,
                 name: leader!.name,
                 imageName: leader!.imageName,
                 type: "leader",

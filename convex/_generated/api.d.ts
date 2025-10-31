@@ -19,7 +19,6 @@ import type * as currentSelection from "../currentSelection.js";
 import type * as leaders from "../leaders.js";
 import type * as lobbies from "../lobbies.js";
 import type * as mapDraft from "../mapDraft.js";
-import type * as maps from "../maps.js";
 import type * as presets from "../presets.js";
 import type * as users from "../users.js";
 
@@ -38,7 +37,6 @@ declare const fullApi: ApiFromModules<{
   leaders: typeof leaders;
   lobbies: typeof lobbies;
   mapDraft: typeof mapDraft;
-  maps: typeof maps;
   presets: typeof presets;
   users: typeof users;
 }>;
