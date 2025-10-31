@@ -21,13 +21,15 @@ export default function DraftMapsPage({
 }) {
   const router = useRouter();
   const { slug: lobbyId } = use(params);
-  
+
   // Use separate queries to minimize re-renders
   // Lobby state changes won't re-render chat, and vice versa
   const lobby = useQuery(api.lobbyData.getLobby, { lobbyId });
   const chat = useQuery(api.lobbyData.getChat, { lobbyId }) ?? [];
-  const selectedMapId = useQuery(api.lobbyData.getCurrentSelection, { lobbyId });
-  
+  const selectedMapId = useQuery(api.lobbyData.getCurrentSelection, {
+    lobbyId,
+  });
+
   const { maps: allMaps, mapsById } = useLeadersMaps();
   const banMap = useMutation(api.mapDraft.banMap);
   const postMessage = useMutation(api.chat.post);
@@ -72,7 +74,7 @@ export default function DraftMapsPage({
     if (!lobby || !mapsById) {
       return [];
     }
-    
+
     const bannedMaps = lobby.team2.bannedMaps
       .map((mapId) => mapsById.get(mapId))
       .filter((map): map is NonNullable<typeof map> => map !== undefined);
@@ -103,7 +105,7 @@ export default function DraftMapsPage({
     if (!selectedMapId) return;
 
     const mapIdToSubmit = selectedMapId;
-    
+
     // Clear selection for ALL users immediately (optimistic)
     clearSelectedMapId({ lobbyId });
 

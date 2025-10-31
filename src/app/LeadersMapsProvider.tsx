@@ -15,7 +15,7 @@ export function LeadersMapsProvider({ children }: { children: ReactNode }) {
   // Create efficient lookup maps for O(1) access instead of O(n) .find()
   const leadersById = useMemo(() => {
     const map = new Map<string, Leader>();
-    leaders.forEach(leader => {
+    leaders.forEach((leader) => {
       map.set(leader.id, leader);
     });
     return map;
@@ -23,14 +23,16 @@ export function LeadersMapsProvider({ children }: { children: ReactNode }) {
 
   const mapsById = useMemo(() => {
     const map = new Map<string, GameMap>();
-    maps.forEach(gameMap => {
+    maps.forEach((gameMap) => {
       map.set(gameMap.id, gameMap);
     });
     return map;
   }, []);
 
   return (
-    <LeadersMapsContext.Provider value={{ leaders, maps, leadersById, mapsById }}>
+    <LeadersMapsContext.Provider
+      value={{ leaders, maps, leadersById, mapsById }}
+    >
       {children}
     </LeadersMapsContext.Provider>
   );

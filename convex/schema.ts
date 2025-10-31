@@ -61,9 +61,9 @@ export default defineSchema({
     leaderBanTimestamp: v.optional(v.number()),
     createdAt: v.optional(v.number()), // Optional for backward compatibility with existing lobbies
     // Legacy fields - kept for backward compatibility, will be migrated
-    chatMessages: v.optional(v.array(
-      v.object({ pseudo: v.string(), message: v.string() }),
-    )),
+    chatMessages: v.optional(
+      v.array(v.object({ pseudo: v.string(), message: v.string() })),
+    ),
     currentSelectionId: v.optional(v.string()),
   })
     .index("by_status", ["status"])
@@ -74,13 +74,11 @@ export default defineSchema({
     pseudo: v.string(),
     message: v.string(),
     createdAt: v.number(),
-  })
-    .index("by_lobby", ["lobbyId", "createdAt"]),
+  }).index("by_lobby", ["lobbyId", "createdAt"]),
   // New table: Separate current selections to avoid lobby updates on hover
   current_selections: defineTable({
     lobbyId: v.id("lobbies"),
     selectionId: v.string(),
     updatedAt: v.number(),
-  })
-    .index("by_lobby", ["lobbyId"]),
+  }).index("by_lobby", ["lobbyId"]),
 });

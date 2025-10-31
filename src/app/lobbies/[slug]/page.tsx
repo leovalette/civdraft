@@ -19,7 +19,7 @@ export default function LobbyPage({
 }) {
   const { slug: lobbyId } = use(params);
   const router = useRouter();
-  
+
   // Use optimized query for lobby data
   const lobby = useQuery(api.lobbyData.getLobby, { lobbyId });
   const { leaders, maps } = useLeadersMaps();

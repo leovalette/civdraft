@@ -24,13 +24,15 @@ export default function DraftMapsPage({
 }) {
   const router = useRouter();
   const { slug: lobbyId } = use(params);
-  
+
   // Use separate queries to minimize re-renders
   // Lobby state changes won't re-render chat, and vice versa
   const lobby = useQuery(api.lobbyData.getLobby, { lobbyId });
   const chat = useQuery(api.lobbyData.getChat, { lobbyId }) ?? [];
-  const selectedLeaderId = useQuery(api.lobbyData.getCurrentSelection, { lobbyId });
-  
+  const selectedLeaderId = useQuery(api.lobbyData.getCurrentSelection, {
+    lobbyId,
+  });
+
   const { leaders, leadersById, mapsById } = useLeadersMaps();
   const pickBanLeader = useMutation(api.leaders.pickBanLeader);
   const postMessage = useMutation(api.chat.post);
@@ -59,9 +61,15 @@ export default function DraftMapsPage({
     }
     const selectedLeaders = lobby.team1.selectedLeaders
       .map((leaderId) => leadersById.get(leaderId))
-      .filter((leader): leader is NonNullable<typeof leader> => leader !== undefined);
-    
-    if (lobby.currentTeamTurn === 1 && lobby.draftStatus.type === "PICK" && selectedLeaderId) {
+      .filter(
+        (leader): leader is NonNullable<typeof leader> => leader !== undefined,
+      );
+
+    if (
+      lobby.currentTeamTurn === 1 &&
+      lobby.draftStatus.type === "PICK" &&
+      selectedLeaderId
+    ) {
       const currentlySelected = leadersById.get(selectedLeaderId);
       if (currentlySelected) {
         return [...selectedLeaders, currentlySelected];
@@ -76,9 +84,15 @@ export default function DraftMapsPage({
     }
     const selectedLeaders = lobby.team2.selectedLeaders
       .map((leaderId) => leadersById.get(leaderId))
-      .filter((leader): leader is NonNullable<typeof leader> => leader !== undefined);
-    
-    if (lobby.currentTeamTurn === 2 && lobby.draftStatus.type === "PICK" && selectedLeaderId) {
+      .filter(
+        (leader): leader is NonNullable<typeof leader> => leader !== undefined,
+      );
+
+    if (
+      lobby.currentTeamTurn === 2 &&
+      lobby.draftStatus.type === "PICK" &&
+      selectedLeaderId
+    ) {
       const currentlySelected = leadersById.get(selectedLeaderId);
       if (currentlySelected) {
         return [...selectedLeaders, currentlySelected];
@@ -93,9 +107,15 @@ export default function DraftMapsPage({
     }
     const bannedLeaders = lobby.team1.bannedLeaders
       .map((leaderId) => leadersById.get(leaderId))
-      .filter((leader): leader is NonNullable<typeof leader> => leader !== undefined);
-    
-    if (lobby.currentTeamTurn === 1 && lobby.draftStatus.type === "BAN" && selectedLeaderId) {
+      .filter(
+        (leader): leader is NonNullable<typeof leader> => leader !== undefined,
+      );
+
+    if (
+      lobby.currentTeamTurn === 1 &&
+      lobby.draftStatus.type === "BAN" &&
+      selectedLeaderId
+    ) {
       const currentlySelected = leadersById.get(selectedLeaderId);
       if (currentlySelected) {
         return [...bannedLeaders, currentlySelected];
@@ -110,9 +130,15 @@ export default function DraftMapsPage({
     }
     const bannedLeaders = lobby.team2.bannedLeaders
       .map((leaderId) => leadersById.get(leaderId))
-      .filter((leader): leader is NonNullable<typeof leader> => leader !== undefined);
-    
-    if (lobby.currentTeamTurn === 2 && lobby.draftStatus.type === "BAN" && selectedLeaderId) {
+      .filter(
+        (leader): leader is NonNullable<typeof leader> => leader !== undefined,
+      );
+
+    if (
+      lobby.currentTeamTurn === 2 &&
+      lobby.draftStatus.type === "BAN" &&
+      selectedLeaderId
+    ) {
       const currentlySelected = leadersById.get(selectedLeaderId);
       if (currentlySelected) {
         return [...bannedLeaders, currentlySelected];
@@ -167,7 +193,7 @@ export default function DraftMapsPage({
     if (!selectedLeaderId) return;
 
     const leaderIdToSubmit = selectedLeaderId;
-    
+
     // Clear selection for ALL users immediately (optimistic)
     clearSelectedLeaderId({ lobbyId });
 

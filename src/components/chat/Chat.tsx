@@ -1,4 +1,4 @@
-import { useRef, useEffect, memo } from "react";
+import { memo, useEffect, useRef } from "react";
 
 type ChatProps = {
   messages: { pseudo: string; message: string }[];

@@ -21,7 +21,7 @@ export const get = query({
       .take(limit);
 
     // Return in chronological order (oldest first)
-    return messages.reverse().map(msg => ({
+    return messages.reverse().map((msg) => ({
       pseudo: msg.pseudo,
       message: msg.message,
     }));

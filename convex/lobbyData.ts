@@ -30,7 +30,7 @@ export const getChat = query({
       .order("desc")
       .take(limit);
 
-    return chatMessages.reverse().map(msg => ({
+    return chatMessages.reverse().map((msg) => ({
       pseudo: msg.pseudo,
       message: msg.message,
     }));
@@ -87,7 +87,7 @@ export const getLobbyData = query({
 
     return {
       lobby,
-      chat: chatMessages.reverse().map(msg => ({
+      chat: chatMessages.reverse().map((msg) => ({
         pseudo: msg.pseudo,
         message: msg.message,
       })),
@@ -116,12 +116,12 @@ export const listActiveLobbies = query({
     const lobbies = await ctx.db
       .query("lobbies")
       .withIndex("by_status")
-      .filter((q) => 
+      .filter((q) =>
         q.or(
           q.eq(q.field("status"), "LOBBY"),
           q.eq(q.field("status"), "MAP_SELECTION"),
           q.eq(q.field("status"), "LEADER_SELECTION"),
-        )
+        ),
       )
       .collect();
 

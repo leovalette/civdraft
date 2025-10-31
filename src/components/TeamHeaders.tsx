@@ -36,51 +36,53 @@ type TeamHeadersProps = {
   currentStatus: `${"PICK" | "BAN" | "MAPBAN"}${number}`;
   numberOfBansFirstRotation: number;
 };
-export const TeamHeaders = memo(({
-  team1,
-  team2,
-  currentStatus,
-  numberOfBansFirstRotation,
-}: TeamHeadersProps) => {
-  const teamSelecting = useMemo<"TEAM1" | "TEAM2" | undefined>(() => {
-    const statusNumber = Number(currentStatus.slice(-1));
-    if (Number.isNaN(statusNumber)) {
-      return undefined;
-    }
-    return !Number.isNaN(statusNumber) && statusNumber % 2 === 1
-      ? "TEAM1"
-      : "TEAM2";
-  }, [currentStatus]);
+export const TeamHeaders = memo(
+  ({
+    team1,
+    team2,
+    currentStatus,
+    numberOfBansFirstRotation,
+  }: TeamHeadersProps) => {
+    const teamSelecting = useMemo<"TEAM1" | "TEAM2" | undefined>(() => {
+      const statusNumber = Number(currentStatus.slice(-1));
+      if (Number.isNaN(statusNumber)) {
+        return undefined;
+      }
+      return !Number.isNaN(statusNumber) && statusNumber % 2 === 1
+        ? "TEAM1"
+        : "TEAM2";
+    }, [currentStatus]);
 
-  const status = useMemo<string | undefined>(
-    () =>
-      getDraftStatus(team1, team2, currentStatus, numberOfBansFirstRotation),
-    [currentStatus, team1, team2, numberOfBansFirstRotation],
-  );
+    const status = useMemo<string | undefined>(
+      () =>
+        getDraftStatus(team1, team2, currentStatus, numberOfBansFirstRotation),
+      [currentStatus, team1, team2, numberOfBansFirstRotation],
+    );
 
-  return (
-    <div className="flex items-center justify-between uppercase text-white">
-      <div
-        className={`w-1/3 rounded-md border-2 border-border bg-team1 p-2 text-right sm:p-1 md:p-1 lg:p-2 xl:p-2 ${
-          teamSelecting === "TEAM1" ? "border-golden-border" : ""
-        }`}
-      >
-        <span>{team1}</span>
-      </div>
-      <div className="w-1/5">
-        <div className="rounded-md border-2 bg-border p-2 text-center sm:p-1 md:p-1 lg:p-2 xl:p-2">
-          {status}
+    return (
+      <div className="flex items-center justify-between uppercase text-white">
+        <div
+          className={`w-1/3 rounded-md border-2 border-border bg-team1 p-2 text-right sm:p-1 md:p-1 lg:p-2 xl:p-2 ${
+            teamSelecting === "TEAM1" ? "border-golden-border" : ""
+          }`}
+        >
+          <span>{team1}</span>
+        </div>
+        <div className="w-1/5">
+          <div className="rounded-md border-2 bg-border p-2 text-center sm:p-1 md:p-1 lg:p-2 xl:p-2">
+            {status}
+          </div>
+        </div>
+        <div
+          className={`w-1/3 rounded-md border-2 border-border bg-team2 p-2 sm:p-1 md:p-1 lg:p-2 xl:p-2 ${
+            teamSelecting === "TEAM2" ? "border-golden-border" : ""
+          }`}
+        >
+          <span>{team2}</span>
         </div>
       </div>
-      <div
-        className={`w-1/3 rounded-md border-2 border-border bg-team2 p-2 sm:p-1 md:p-1 lg:p-2 xl:p-2 ${
-          teamSelecting === "TEAM2" ? "border-golden-border" : ""
-        }`}
-      >
-        <span>{team2}</span>
-      </div>
-    </div>
-  );
-});
+    );
+  },
+);
 
 TeamHeaders.displayName = "TeamHeaders";

@@ -8,19 +8,21 @@ type DraftActionsProps = {
   isObserver: boolean;
   disabled?: boolean;
 };
-export const DraftActions = memo(({
-  currentStatus,
-  canPlay,
-  onPickBan,
-  isObserver,
-  disabled,
-}: DraftActionsProps) => (
-  <div>
-    <CivPrimaryButton onClick={onPickBan} disabled={!canPlay || disabled}>
-      {canPlay ? getPhase(currentStatus) : getAction(isObserver)}
-    </CivPrimaryButton>
-  </div>
-));
+export const DraftActions = memo(
+  ({
+    currentStatus,
+    canPlay,
+    onPickBan,
+    isObserver,
+    disabled,
+  }: DraftActionsProps) => (
+    <div>
+      <CivPrimaryButton onClick={onPickBan} disabled={!canPlay || disabled}>
+        {canPlay ? getPhase(currentStatus) : getAction(isObserver)}
+      </CivPrimaryButton>
+    </div>
+  ),
+);
 
 DraftActions.displayName = "DraftActions";
 
