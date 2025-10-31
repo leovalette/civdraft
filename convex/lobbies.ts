@@ -64,8 +64,8 @@ export const create = mutation({
             index: 1,
           },
       withMapDraft: mapDraft,
-      chatMessages: [],
       currentTeamTurn: 1,
+      createdAt: Date.now(),
     });
   },
 });

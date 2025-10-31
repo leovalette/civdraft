@@ -57,11 +57,30 @@ export default defineSchema({
       type: v.union(v.literal("PICK"), v.literal("BAN"), v.literal("MAPBAN")),
       index: v.number(),
     }),
-    chatMessages: v.array(
-      v.object({ pseudo: v.string(), message: v.string() }),
-    ),
     mapBanTimestamp: v.optional(v.number()),
     leaderBanTimestamp: v.optional(v.number()),
+    createdAt: v.optional(v.number()), // Optional for backward compatibility with existing lobbies
+    // Legacy fields - kept for backward compatibility, will be migrated
+    chatMessages: v.optional(v.array(
+      v.object({ pseudo: v.string(), message: v.string() }),
+    )),
     currentSelectionId: v.optional(v.string()),
-  }),
+  })
+    .index("by_status", ["status"])
+    .index("by_status_createdAt", ["status", "createdAt"]),
+  // New table: Separate chat messages for better performance
+  chat_messages: defineTable({
+    lobbyId: v.id("lobbies"),
+    pseudo: v.string(),
+    message: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_lobby", ["lobbyId", "createdAt"]),
+  // New table: Separate current selections to avoid lobby updates on hover
+  current_selections: defineTable({
+    lobbyId: v.id("lobbies"),
+    selectionId: v.string(),
+    updatedAt: v.number(),
+  })
+    .index("by_lobby", ["lobbyId"]),
 });

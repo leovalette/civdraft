@@ -24,12 +24,16 @@ export default function DraftMapsPage({
 }) {
   const router = useRouter();
   const { slug: lobbyId } = use(params);
-  const lobby = useQuery(api.lobbies.get, { lobbyId });
+  
+  // Single optimized query instead of 3 separate ones
+  const lobbyData = useQuery(api.lobbyData.getLobbyData, { lobbyId });
+  const lobby = lobbyData?.lobby;
+  const chat = lobbyData?.chat ?? [];
+  const selectedLeaderId = lobbyData?.currentSelection;
+  
   const { leaders, maps } = useLeadersMaps();
   const pickBanLeader = useMutation(api.leaders.pickBanLeader);
-  const chat = useQuery(api.chat.get, { lobbyId });
   const postMessage = useMutation(api.chat.post);
-  const selectedLeaderId = useQuery(api.currentSelection.get, { lobbyId });
   const setSelectedLeaderId = useMutation(api.currentSelection.set);
   const clearSelectedLeaderId = useMutation(api.currentSelection.clear);
 
@@ -165,15 +169,20 @@ export default function DraftMapsPage({
   const handleConfirm = async () => {
     if (!selectedLeaderId) return;
 
+    // Optimistic update: Clear selection immediately for instant UI feedback
+    const leaderIdToSubmit = selectedLeaderId;
+    clearSelectedLeaderId({ lobbyId });
+
     try {
       await pickBanLeader({
         lobbyId,
-        leaderId: selectedLeaderId,
+        leaderId: leaderIdToSubmit,
         teamNumber: currentTeam,
       });
-      clearSelectedLeaderId({ lobbyId });
     } catch (error) {
       console.error("Error banning leader:", error);
+      // On error, you could optionally re-set the selection
+      // setSelectedLeaderId({ lobbyId, selectionId: leaderIdToSubmit });
     }
   };
 

@@ -18,7 +18,9 @@ import type * as chat from "../chat.js";
 import type * as currentSelection from "../currentSelection.js";
 import type * as leaders from "../leaders.js";
 import type * as lobbies from "../lobbies.js";
+import type * as lobbyData from "../lobbyData.js";
 import type * as mapDraft from "../mapDraft.js";
+import type * as migrations from "../migrations.js";
 import type * as presets from "../presets.js";
 import type * as users from "../users.js";
 
@@ -36,7 +38,9 @@ declare const fullApi: ApiFromModules<{
   currentSelection: typeof currentSelection;
   leaders: typeof leaders;
   lobbies: typeof lobbies;
+  lobbyData: typeof lobbyData;
   mapDraft: typeof mapDraft;
+  migrations: typeof migrations;
   presets: typeof presets;
   users: typeof users;
 }>;
