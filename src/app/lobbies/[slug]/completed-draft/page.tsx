@@ -85,6 +85,8 @@ export default function CompletedMapsPage({
         teamName1: lobby.team1.name,
         teamName2: lobby.team2.name,
         selectedMap: selectedMap ? selectedMap.name : "",
+        numberOfBansFirstRotation: lobby.numberOfBansFirstRotation,
+        numberOfBansSecondRotation: lobby.numberOfBansSecondRotation,
       });
       navigator.clipboard.writeText(draftExported);
     }
@@ -228,6 +230,8 @@ const exportDraft = ({
   teamName1,
   teamName2,
   selectedMap,
+  numberOfBansFirstRotation,
+  numberOfBansSecondRotation,
 }: {
   picksTeam1: string[];
   picksTeam2: string[];
@@ -237,17 +241,28 @@ const exportDraft = ({
   teamName2: string;
   mapBans: string[];
   selectedMap: string;
+  numberOfBansFirstRotation: number;
+  numberOfBansSecondRotation: number;
 }): string => {
   const mapBansText =
     mapBans.length > 0 ? `Map bans : ${mapBans.join(" / ")}` : "";
 
-  const civBans = Array.from({
-    length: Math.max(bansTeam1.length, bansTeam2.length),
+  const civBansFirstRotation = Array.from({
+    length: numberOfBansFirstRotation / 2,
   }).flatMap((_, i) =>
     [bansTeam1[i], bansTeam2[i]].filter((x) => x !== undefined),
   );
 
-  const bansText = `Leader bans : ${civBans.join(" / ")}`;
+  const civBansSecondRotation = Array.from({
+    length: numberOfBansSecondRotation / 2,
+  }).flatMap((_, i) =>
+    [
+      bansTeam2[i + numberOfBansFirstRotation / 2],
+      bansTeam1[i + numberOfBansFirstRotation / 2],
+    ].filter((x) => x !== undefined),
+  );
+
+  const bansText = `Leader bans : ${[...civBansFirstRotation, ...civBansSecondRotation].join(" / ")}`;
 
   const picksTeam1Text = `${teamName1}\n${picksTeam1
     .map((pick, index) => `Player${index + 1} ${pick}`)
