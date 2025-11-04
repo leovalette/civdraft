@@ -174,11 +174,9 @@ export default function DraftMapsPage({
       leaders
         ?.filter(
           (leader) =>
-            leader.name
-              .toLowerCase()
-              .trim()
-              .includes(search.toLowerCase().trim()) &&
-            leader.name !== "TIMEOUT",
+            leader.filters.some((filter) =>
+              filter.toLowerCase().trim().includes(search.toLowerCase().trim()),
+            ) && leader.name !== "TIMEOUT",
         )
         .sort((a, b) => a.name.localeCompare(b.name)) ?? [],
     [leaders, search],

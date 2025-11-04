@@ -100,6 +100,7 @@ export default function LobbyPage({
     }
   }, [userId, lobbyId, toggleTeamReady, isTogglingReady]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Only run once when lobbyId is set
   useEffect(() => {
     // Get or generate user identification on mount
     const pseudo = getUserPseudo();
