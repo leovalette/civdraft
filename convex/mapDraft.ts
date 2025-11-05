@@ -3,7 +3,8 @@ import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { internalMutation, mutation } from "./_generated/server";
 
-const MAP_BAN_TIMEOUT_MS = 60 * 1000; // 1 minute
+// Add 1 second buffer to account for network latency and timing precision
+const MAP_BAN_TIMEOUT_MS = 61 * 1000; // 61 seconds (displayed as 60 to users)
 const DEFAULT_AUTO_BAN_MAP_ID = "j974thpwrm9p782e0n9j9tnyv57spqrv";
 
 export const startMapDraft = mutation({

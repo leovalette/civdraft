@@ -3,7 +3,8 @@ import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { internalMutation, mutation } from "./_generated/server";
 
-const LEADER_BAN_TIMEOUT_MS = 60 * 1000; // 1 minute
+// Add 1 second buffer to account for network latency and timing precision
+const LEADER_BAN_TIMEOUT_MS = 61 * 1000; // 61 seconds (displayed as 60 to users)
 const DEFAULT_AUTO_BAN_LEADER_ID = "j57fjx93m411nayke84bp9e4pd7spskp";
 
 export const pickBanLeader = mutation({
