@@ -4,63 +4,109 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./Timer.module.css";
 
 type TimerProps = {
-  timestamp: Date;
+  /** The server-side epoch timestamp (ms) when the current turn started */
+  timestampMs: number;
+  /** Total countdown duration in seconds */
   timerDuration: number;
+  /** Offset in ms: serverTime - clientTime. Add to Date.now() to approximate server time. */
+  serverTimeOffsetMs: number;
 };
 
-export const Timer = ({ timestamp, timerDuration }: TimerProps) => {
-  const [time, setTime] = useState(new Date());
+/**
+ * Compute an adjusted "server now" using monotonic time to avoid UI jumps
+ * if the user changes their system clock while the page is open.
+ */
+function getAdjustedNowMs(anchor: {
+  clientWallMs: number;
+  clientPerfMs: number;
+  serverNowMs: number;
+}) {
+  if (typeof performance !== "undefined") {
+    const elapsed = performance.now() - anchor.clientPerfMs;
+    return anchor.serverNowMs + elapsed;
+  }
+  const wallElapsed = Date.now() - anchor.clientWallMs;
+  return anchor.serverNowMs + wallElapsed;
+}
+
+export const Timer = ({
+  timestampMs,
+  timerDuration,
+  serverTimeOffsetMs,
+}: TimerProps) => {
+  const [, setTick] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const countdownRef = useRef<HTMLAudioElement | null>(null);
-  const timestampRef = useRef(timestamp);
-  
-  // Update timestamp ref when it changes
-  useEffect(() => {
-    timestampRef.current = timestamp;
-  }, [timestamp]);
 
+  // Anchor: snapshot of clocks at the time we received the offset.
+  // Used with performance.now() so the UI doesn't jump on system-clock changes.
+  const anchorRef = useRef({
+    clientWallMs: Date.now(),
+    clientPerfMs: typeof performance !== "undefined" ? performance.now() : 0,
+    serverNowMs: Date.now() + serverTimeOffsetMs,
+  });
+
+  // Re-anchor when the offset changes (i.e. a new serverTime query result)
   useEffect(() => {
-    // Use requestAnimationFrame for more accurate timing
+    anchorRef.current = {
+      clientWallMs: Date.now(),
+      clientPerfMs: typeof performance !== "undefined" ? performance.now() : 0,
+      serverNowMs: Date.now() + serverTimeOffsetMs,
+    };
+  }, [serverTimeOffsetMs]);
+
+  const stoppedRef = useRef(false);
+  const prevTimestampRef = useRef(timestampMs);
+
+  // Detect new turn (timestamp changed) → restart the RAF loop
+  if (prevTimestampRef.current !== timestampMs) {
+    prevTimestampRef.current = timestampMs;
+    stoppedRef.current = false;
+  }
+
+  // RAF loop — throttled to ~100ms updates, stops when timer reaches 0
+  useEffect(() => {
     let animationFrameId: number;
-    let lastUpdateTime = Date.now();
-    
+    let lastUpdateTime = 0;
+
     const updateTimer = () => {
-      const now = Date.now();
-      // Only update state every ~100ms to balance accuracy and performance
+      if (stoppedRef.current) return;
+      const now = performance?.now?.() ?? Date.now();
       if (now - lastUpdateTime >= 100) {
-        setTime(new Date(now));
+        setTick(now);
         lastUpdateTime = now;
       }
       animationFrameId = requestAnimationFrame(updateTimer);
     };
-    
-    animationFrameId = requestAnimationFrame(updateTimer);
 
-    return () => cancelAnimationFrame(animationFrameId);
+    animationFrameId = requestAnimationFrame(updateTimer);
+    return () => {
+      stoppedRef.current = true;
+      cancelAnimationFrame(animationFrameId);
+    };
   }, []);
 
   useEffect(() => {
     if (!countdownRef.current) {
       const audio = new Audio("/countdown.wav");
       countdownRef.current = audio;
-      audio.onended = () => {
-        setIsPlaying(false);
-      };
+      audio.onended = () => setIsPlaying(false);
     }
   }, []);
 
-  // Calculate time left with precision
-  const elapsedMs = time.getTime() - timestampRef.current.getTime();
-  const elapsedSeconds = elapsedMs / 1000;
+  // Compute time left using server-synced clock
+  const serverNowMs = getAdjustedNowMs(anchorRef.current);
+  const elapsedSeconds = (serverNowMs - timestampMs) / 1000;
   const timeLeftPrecise = timerDuration - elapsedSeconds;
-  
-  // Use ceiling to ensure we don't show 0 before the server timeout
-  // This adds a small buffer (up to 1 second) to account for network latency
+
   let timeLeft = Math.ceil(Math.max(0, timeLeftPrecise));
-  
-  // Special handling: if we're very close to 0, show 0
   if (timeLeftPrecise <= 0) {
     timeLeft = 0;
+  }
+
+  // Stop the RAF loop once the timer hits 0
+  if (timeLeft <= 0) {
+    stoppedRef.current = true;
   }
 
   if (timeLeft < 4 && timeLeft > 0 && !isPlaying && countdownRef.current) {

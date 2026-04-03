@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
+import type { MutationCtx } from "./_generated/server";
 import { internalMutation, mutation } from "./_generated/server";
 
 // Add 1 second buffer to account for network latency and timing precision
@@ -19,7 +20,7 @@ export const pickBanLeader = mutation({
 });
 
 async function performLeaderPickBan(
-  ctx: any,
+  ctx: MutationCtx,
   lobbyId: Id<"lobbies">,
   leaderId: string,
   teamNumber: 1 | 2,

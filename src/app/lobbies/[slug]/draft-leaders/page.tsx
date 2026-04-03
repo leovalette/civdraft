@@ -1,9 +1,8 @@
 "use client";
 
-import { useMutation, useQuery } from "convex/react";
+import { useMutation } from "convex/react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { use, useCallback, useEffect, useMemo, useState } from "react";
+import { use, useMemo, useState } from "react";
 import { useLeadersMaps } from "@/app/LeadersMapsProvider";
 import { Bans } from "@/components/bans/Bans";
 import { Chat } from "@/components/chat/Chat";
@@ -13,47 +12,41 @@ import { Search } from "@/components/Search";
 import { TeamHeaders } from "@/components/TeamHeaders";
 import { TeamSelection } from "@/components/TeamSelection";
 import { Timer } from "@/components/Timer";
-import { getUserId, getUserPseudo } from "@/lib/user";
+import { useDraft } from "@/hooks/useDraft";
 import { api } from "../../../../../convex/_generated/api";
 import type { Id } from "../../../../../convex/_generated/dataModel";
 
-export default function DraftMapsPage({
+export default function DraftLeadersPage({
   params,
 }: {
   params: Promise<{ slug: Id<"lobbies"> }>;
 }) {
-  const router = useRouter();
   const { slug: lobbyId } = use(params);
 
-  // Use separate queries to minimize re-renders
-  // Lobby state changes won't re-render chat, and vice versa
-  const lobby = useQuery(api.lobbyData.getLobby, { lobbyId });
-  const chat = useQuery(api.lobbyData.getChat, { lobbyId }) ?? [];
-  const selectedLeaderId = useQuery(api.lobbyData.getCurrentSelection, {
-    lobbyId,
+  const {
+    lobby,
+    chat,
+    currentSelectionId: selectedLeaderId,
+    serverTimeOffsetMs,
+    currentTeam,
+    isObserver,
+    canPlay,
+    onPostMessage,
+    onSelect,
+    onClearSelection,
+  } = useDraft(lobbyId, {
+    expectedStatus: "LEADER_SELECTION",
+    redirects: {
+      LOBBY: `/lobbies/${lobbyId}`,
+      MAP_SELECTION: `/lobbies/${lobbyId}/draft-maps`,
+      COMPLETED: `/lobbies/${lobbyId}/completed-draft`,
+    },
   });
 
   const { leaders, leadersById, mapsById } = useLeadersMaps();
   const pickBanLeader = useMutation(api.leaders.pickBanLeader);
-  const postMessage = useMutation(api.chat.post);
-  const setSelectedLeaderId = useMutation(api.currentSelection.set);
-  const clearSelectedLeaderId = useMutation(api.currentSelection.clear);
-
-  const userId = getUserId();
-  const pseudo = getUserPseudo();
 
   const [search, setSearch] = useState<string>("");
-
-  const [timerTimestamp, setTimerTimestamp] = useState<Date>(() =>
-    lobby?.leaderBanTimestamp ? new Date(lobby.leaderBanTimestamp) : new Date(),
-  );
-
-  useEffect(() => {
-    if (!lobby) return;
-    if (lobby.leaderBanTimestamp) {
-      setTimerTimestamp(new Date(lobby.leaderBanTimestamp));
-    }
-  }, [lobby?.leaderBanTimestamp, lobby]);
 
   const team1SelectedLeaders = useMemo(() => {
     if (!lobby || !leadersById) {
@@ -154,21 +147,6 @@ export default function DraftMapsPage({
     return lobby.numberOfPicksFirstRotation + lobby.numberOfPicksSecondRotation;
   }, [lobby]);
 
-  const currentTeam = useMemo(() => lobby?.currentTeamTurn ?? 1, [lobby]);
-
-  const isObserver = useMemo(
-    () => lobby?.observers.some((observer) => observer.id === userId) ?? false,
-    [lobby, userId],
-  );
-
-  const canPlay = useMemo(() => {
-    const isPlayerTeam1 =
-      lobby?.team1.players.some((player) => player.id === userId) ?? false;
-    const isPlayerTeam2 =
-      lobby?.team2.players.some((player) => player.id === userId) ?? false;
-    return (currentTeam === 1 ? isPlayerTeam1 : isPlayerTeam2) && !isObserver;
-  }, [currentTeam, isObserver, lobby, userId]);
-
   const filteredLeaders = useMemo(
     () =>
       leaders
@@ -191,9 +169,7 @@ export default function DraftMapsPage({
     if (!selectedLeaderId) return;
 
     const leaderIdToSubmit = selectedLeaderId;
-
-    // Clear selection for ALL users immediately (optimistic)
-    clearSelectedLeaderId({ lobbyId });
+    onClearSelection();
 
     try {
       await pickBanLeader({
@@ -203,27 +179,9 @@ export default function DraftMapsPage({
       });
     } catch (error) {
       console.error("Error banning leader:", error);
-      // On error, restore the selection for everyone
-      setSelectedLeaderId({ lobbyId, selectionId: leaderIdToSubmit });
+      onSelect(leaderIdToSubmit);
     }
   };
-
-  useEffect(() => {
-    if (lobby?.status === "LOBBY") {
-      router.push(`/lobbies/${lobbyId}`);
-    }
-    if (lobby?.status === "MAP_SELECTION") {
-      router.push(`/lobbies/${lobbyId}/draft-maps`);
-    }
-    if (lobby?.status === "COMPLETED") {
-      router.push(`/lobbies/${lobbyId}/completed-draft`);
-    }
-  }, [lobby, lobbyId, router]);
-
-  const onPostMessage = useCallback(
-    (message: string) => postMessage({ message, pseudo, lobbyId }),
-    [pseudo, postMessage, lobbyId],
-  );
 
   return (
     <div className="flex  h-screen w-full flex-col items-center justify-center gap-2 p-8 text-text-primary">
@@ -244,9 +202,9 @@ export default function DraftMapsPage({
               <TeamSelection
                 leaderOrMaps={
                   team1SelectedLeaders.map((leader) => ({
-                    id: leader!.id,
-                    name: leader!.name,
-                    imageName: leader!.imageName,
+                    id: leader?.id,
+                    name: leader?.name,
+                    imageName: leader?.imageName,
                     type: "leader",
                   })) ?? []
                 }
@@ -272,7 +230,13 @@ export default function DraftMapsPage({
               <Search value={search} setValue={setSearch} />
             </div>
             <div className="flex justify-between gap-6 sm:scale-75 md:scale-75 lg:scale-75">
-              <Timer timestamp={timerTimestamp} timerDuration={60} />
+              {lobby?.leaderBanTimestamp && (
+                <Timer
+                  timestampMs={lobby.leaderBanTimestamp}
+                  timerDuration={60}
+                  serverTimeOffsetMs={serverTimeOffsetMs}
+                />
+              )}
             </div>
           </div>
           <div className="flex h-4/5 flex-wrap justify-center gap-4 overflow-y-scroll">
@@ -298,7 +262,7 @@ export default function DraftMapsPage({
                 type="leader"
                 onClick={() => {
                   if (canPlay) {
-                    setSelectedLeaderId({ lobbyId, selectionId: leader.id });
+                    onSelect(leader.id);
                   }
                 }}
               />
@@ -310,9 +274,9 @@ export default function DraftMapsPage({
             <TeamSelection
               leaderOrMaps={
                 team2SelectedLeaders.map((leader) => ({
-                  id: leader!.id,
-                  name: leader!.name,
-                  imageName: leader!.imageName,
+                  id: leader?.id,
+                  name: leader?.name,
+                  imageName: leader?.imageName,
                   type: "leader",
                 })) ?? []
               }
@@ -331,16 +295,16 @@ export default function DraftMapsPage({
               <Bans
                 numberOfBans={lobby.numberOfBansFirstRotation / 2}
                 bans={team1BannedLeaders.map((ban) => ({
-                  name: ban!.name,
-                  src: ban!.imageName,
+                  name: ban?.name,
+                  src: ban?.imageName,
                 }))}
                 draftStatus={lobby.draftStatus}
               />
               <Bans
                 numberOfBans={lobby.numberOfBansSecondRotation / 2}
                 bans={team1BannedLeaders.map((ban) => ({
-                  name: ban!.name,
-                  src: ban!.imageName,
+                  name: ban?.name,
+                  src: ban?.imageName,
                 }))}
                 draftStatus={lobby.draftStatus}
                 offset={lobby.numberOfBansFirstRotation / 2}
@@ -358,8 +322,8 @@ export default function DraftMapsPage({
               <Bans
                 numberOfBans={lobby.numberOfBansFirstRotation / 2}
                 bans={team2BannedLeaders.map((ban) => ({
-                  name: ban!.name,
-                  src: ban!.imageName,
+                  name: ban?.name,
+                  src: ban?.imageName,
                 }))}
                 isTeam2
                 isOdd
@@ -368,8 +332,8 @@ export default function DraftMapsPage({
               <Bans
                 numberOfBans={lobby.numberOfBansSecondRotation / 2}
                 bans={team2BannedLeaders.map((ban) => ({
-                  name: ban!.name,
-                  src: ban!.imageName,
+                  name: ban?.name,
+                  src: ban?.imageName,
                 }))}
                 isTeam2
                 draftStatus={lobby.draftStatus}

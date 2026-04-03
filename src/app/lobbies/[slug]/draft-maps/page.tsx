@@ -1,8 +1,7 @@
 "use client";
 
-import { useMutation, useQuery } from "convex/react";
-import { useRouter } from "next/navigation";
-import { use, useCallback, useEffect, useMemo, useState } from "react";
+import { useMutation } from "convex/react";
+import { use, useMemo } from "react";
 import { useLeadersMaps } from "@/app/LeadersMapsProvider";
 import { Chat } from "@/components/chat/Chat";
 import { DraftActions } from "@/components/DraftActions";
@@ -10,7 +9,7 @@ import { LeaderOrMap } from "@/components/Leader";
 import { TeamHeaders } from "@/components/TeamHeaders";
 import { TeamSelection } from "@/components/TeamSelection";
 import { Timer } from "@/components/Timer";
-import { getUserId, getUserPseudo } from "@/lib/user";
+import { useDraft } from "@/hooks/useDraft";
 import { api } from "../../../../../convex/_generated/api";
 import type { Id } from "../../../../../convex/_generated/dataModel";
 
@@ -19,38 +18,30 @@ export default function DraftMapsPage({
 }: {
   params: Promise<{ slug: Id<"lobbies"> }>;
 }) {
-  const router = useRouter();
   const { slug: lobbyId } = use(params);
 
-  // Use separate queries to minimize re-renders
-  // Lobby state changes won't re-render chat, and vice versa
-  const lobby = useQuery(api.lobbyData.getLobby, { lobbyId });
-  const chat = useQuery(api.lobbyData.getChat, { lobbyId }) ?? [];
-  const selectedMapId = useQuery(api.lobbyData.getCurrentSelection, {
-    lobbyId,
+  const {
+    lobby,
+    chat,
+    currentSelectionId: selectedMapId,
+    serverTimeOffsetMs,
+    currentTeam,
+    isObserver,
+    canPlay,
+    onPostMessage,
+    onSelect,
+    onClearSelection,
+  } = useDraft(lobbyId, {
+    expectedStatus: "MAP_SELECTION",
+    redirects: {
+      LOBBY: `/lobbies/${lobbyId}`,
+      LEADER_SELECTION: `/lobbies/${lobbyId}/draft-leaders`,
+      COMPLETED: `/lobbies/${lobbyId}/completed-draft`,
+    },
   });
 
   const { maps: allMaps, mapsById } = useLeadersMaps();
   const banMap = useMutation(api.mapDraft.banMap);
-  const postMessage = useMutation(api.chat.post);
-  const setSelectedMapId = useMutation(api.currentSelection.set);
-  const clearSelectedMapId = useMutation(api.currentSelection.clear);
-
-  const userId = getUserId();
-  const pseudo = getUserPseudo();
-
-  const currentTeam = useMemo(() => lobby?.currentTeamTurn ?? 1, [lobby]);
-
-  const [timerTimestamp, setTimerTimestamp] = useState<Date>(() =>
-    lobby?.mapBanTimestamp ? new Date(lobby.mapBanTimestamp) : new Date(),
-  );
-
-  useEffect(() => {
-    if (!lobby) return;
-    if (lobby.mapBanTimestamp) {
-      setTimerTimestamp(new Date(lobby.mapBanTimestamp));
-    }
-  }, [lobby?.mapBanTimestamp, lobby]);
 
   const team1BannedMaps = useMemo(() => {
     if (!lobby || !mapsById) {
@@ -88,26 +79,11 @@ export default function DraftMapsPage({
     return bannedMaps;
   }, [mapsById, lobby, selectedMapId]);
 
-  const isObserver = useMemo(
-    () => lobby?.observers.some((observer) => observer.id === userId) ?? false,
-    [lobby, userId],
-  );
-
-  const canPlay = useMemo(() => {
-    const isPlayerTeam1 =
-      lobby?.team1.players.some((player) => player.id === userId) ?? false;
-    const isPlayerTeam2 =
-      lobby?.team2.players.some((player) => player.id === userId) ?? false;
-    return (currentTeam === 1 ? isPlayerTeam1 : isPlayerTeam2) && !isObserver;
-  }, [currentTeam, isObserver, lobby, userId]);
-
   const handleConfirm = async () => {
     if (!selectedMapId) return;
 
     const mapIdToSubmit = selectedMapId;
-
-    // Clear selection for ALL users immediately (optimistic)
-    clearSelectedMapId({ lobbyId });
+    onClearSelection();
 
     try {
       await banMap({
@@ -117,8 +93,7 @@ export default function DraftMapsPage({
       });
     } catch (error) {
       console.error("Error banning map:", error);
-      // On error, restore the selection for everyone
-      setSelectedMapId({ lobbyId, selectionId: mapIdToSubmit });
+      onSelect(mapIdToSubmit);
     }
   };
 
@@ -140,23 +115,6 @@ export default function DraftMapsPage({
     );
   }, [lobby, availableMaps]);
 
-  useEffect(() => {
-    if (lobby?.status === "LOBBY") {
-      router.push(`/lobbies/${lobbyId}`);
-    }
-    if (lobby?.status === "LEADER_SELECTION") {
-      router.push(`/lobbies/${lobbyId}/draft-leaders`);
-    }
-    if (lobby?.status === "COMPLETED") {
-      router.push(`/lobbies/${lobbyId}/completed-draft`);
-    }
-  }, [lobby, router, lobbyId]);
-
-  const onPostMessage = useCallback(
-    (message: string) => postMessage({ message, pseudo, lobbyId }),
-    [pseudo, postMessage, lobbyId],
-  );
-
   return (
     <div className="flex  h-screen w-full flex-col items-center justify-center gap-2 p-8 text-text-primary">
       <div className="w-full">
@@ -175,9 +133,9 @@ export default function DraftMapsPage({
             <TeamSelection
               leaderOrMaps={
                 team1BannedMaps?.map((map) => ({
-                  id: map!.id,
-                  name: map!.name,
-                  imageName: map!.imageName,
+                  id: map?.id,
+                  name: map?.name,
+                  imageName: map?.imageName,
                   type: "map",
                 })) ?? []
               }
@@ -197,7 +155,13 @@ export default function DraftMapsPage({
         <div className="flex-1">
           <div className="flex items-center">
             <div className="flex justify-between gap-6 sm:scale-75 md:scale-75 lg:scale-75">
-              <Timer timestamp={timerTimestamp} timerDuration={60} />
+              {lobby?.mapBanTimestamp && (
+                <Timer
+                  timestampMs={lobby.mapBanTimestamp}
+                  timerDuration={60}
+                  serverTimeOffsetMs={serverTimeOffsetMs}
+                />
+              )}
             </div>
           </div>
           <div className="flex h-4/5 flex-wrap justify-center gap-4 overflow-y-scroll">
@@ -213,7 +177,7 @@ export default function DraftMapsPage({
                 type="map"
                 onClick={() => {
                   if (canPlay) {
-                    setSelectedMapId({ lobbyId, selectionId: map.id });
+                    onSelect(map.id);
                   }
                 }}
               />
@@ -225,9 +189,9 @@ export default function DraftMapsPage({
             <TeamSelection
               leaderOrMaps={
                 team2BannedMaps?.map((map) => ({
-                  id: map!.id,
-                  name: map!.name,
-                  imageName: map!.imageName,
+                  id: map?.id,
+                  name: map?.name,
+                  imageName: map?.imageName,
                   type: "map",
                 })) ?? []
               }

@@ -1,5 +1,5 @@
-import { v } from "convex/values"
-import { query } from "./_generated/server"
+import { v } from "convex/values";
+import { query } from "./_generated/server";
 
 /**
  * Query to get just the lobby without chat/selection
@@ -10,9 +10,9 @@ export const getLobby = query({
     lobbyId: v.id("lobbies"),
   },
   handler: async (ctx, { lobbyId }) => {
-    return await ctx.db.get(lobbyId)
+    return await ctx.db.get(lobbyId);
   },
-})
+});
 
 /**
  * Query to get just the chat messages
@@ -28,14 +28,14 @@ export const getChat = query({
       .query("chat_messages")
       .withIndex("by_lobby", (q) => q.eq("lobbyId", lobbyId))
       .order("desc")
-      .take(limit)
+      .take(limit);
 
     return chatMessages.reverse().map((msg) => ({
       pseudo: msg.pseudo,
       message: msg.message,
-    }))
+    }));
   },
-})
+});
 
 /**
  * Query to get just the current selection
@@ -49,12 +49,8 @@ export const getCurrentSelection = query({
     const selection = await ctx.db
       .query("current_selections")
       .withIndex("by_lobby", (q) => q.eq("lobbyId", lobbyId))
-      .first()
+      .first();
 
-    return selection?.selectionId
+    return selection?.selectionId;
   },
-})
-
-
-
-
+});

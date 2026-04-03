@@ -22,6 +22,7 @@ import type * as lobbyData from "../lobbyData.js";
 import type * as mapDraft from "../mapDraft.js";
 import type * as migrations from "../migrations.js";
 import type * as presets from "../presets.js";
+import type * as serverTime from "../serverTime.js";
 import type * as users from "../users.js";
 
 /**
@@ -42,6 +43,7 @@ declare const fullApi: ApiFromModules<{
   mapDraft: typeof mapDraft;
   migrations: typeof migrations;
   presets: typeof presets;
+  serverTime: typeof serverTime;
   users: typeof users;
 }>;
 export declare const api: FilterApi<
