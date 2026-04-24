@@ -32,11 +32,15 @@ async function performLeaderPickBan(
   if (lobby.status !== "LEADER_SELECTION") {
     return;
   }
+  // The TIMEOUT sentinel leader is allowed to appear multiple times in bans
+  // (once per timed-out turn) — skip the duplicate check for it.
+  const isTimeoutSentinel = leaderId === DEFAULT_AUTO_BAN_LEADER_ID;
   if (
-    lobby.team1.bannedLeaders.includes(leaderId) ||
-    lobby.team2.bannedLeaders.includes(leaderId) ||
-    lobby.team1.selectedLeaders.includes(leaderId) ||
-    lobby.team2.selectedLeaders.includes(leaderId)
+    !isTimeoutSentinel &&
+    (lobby.team1.bannedLeaders.includes(leaderId) ||
+      lobby.team2.bannedLeaders.includes(leaderId) ||
+      lobby.team1.selectedLeaders.includes(leaderId) ||
+      lobby.team2.selectedLeaders.includes(leaderId))
   ) {
     throw new Error("Leader already banned");
   }

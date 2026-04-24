@@ -145,18 +145,24 @@ export const checkMapBanTimeout = internalMutation({
       return; // A ban was made or status changed, do nothing
     }
 
-    // Use pre-selected map if available and valid, else fallback to default
+    // Use pre-selected map if available and valid, else pick any available map
     const preSelection = await ctx.db
       .query("current_selections")
       .withIndex("by_lobby", (q) => q.eq("lobbyId", lobbyId))
       .first();
 
-    const mapIdToUse =
+    const preSelectedValid =
       preSelection?.selectionId &&
       lobby.mapIds.includes(preSelection.selectionId) &&
-      !lobby.bannedMapIds.includes(preSelection.selectionId)
-        ? preSelection.selectionId
-        : DEFAULT_AUTO_BAN_MAP_ID;
+      !lobby.bannedMapIds.includes(preSelection.selectionId);
+
+    const preSelectedId = preSelectedValid
+      ? preSelection?.selectionId
+      : undefined;
+    const mapIdToUse = preSelectedId
+      ? preSelectedId
+      : (lobby.mapIds.find((id: string) => !lobby.bannedMapIds.includes(id)) ??
+        DEFAULT_AUTO_BAN_MAP_ID);
 
     // Clear the pre-selection so clients don't see stale state
     if (preSelection) {
