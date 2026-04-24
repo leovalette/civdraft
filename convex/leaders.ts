@@ -154,13 +154,37 @@ export const checkLeaderBanTimeout = internalMutation({
       return; // A ban was made or status changed, do nothing
     }
 
-    // Auto-ban the default leader
-    await performLeaderPickBan(
-      ctx,
-      lobbyId,
-      DEFAULT_AUTO_BAN_LEADER_ID,
-      getCurrentTeamTurn(lobby.draftStatus, lobby.numberOfBansFirstRotation),
+    // Use pre-selected leader if available and valid, else fallback to default
+    const teamTurn = getCurrentTeamTurn(
+      lobby.draftStatus,
+      lobby.numberOfBansFirstRotation,
     );
+
+    const preSelection = await ctx.db
+      .query("current_selections")
+      .withIndex("by_lobby", (q) => q.eq("lobbyId", lobbyId))
+      .first();
+
+    const allBannedOrPicked = [
+      ...lobby.team1.bannedLeaders,
+      ...lobby.team2.bannedLeaders,
+      ...lobby.team1.selectedLeaders,
+      ...lobby.team2.selectedLeaders,
+      ...lobby.autoBannedLeaderIds,
+    ];
+
+    const leaderIdToUse =
+      preSelection?.selectionId &&
+      !allBannedOrPicked.includes(preSelection.selectionId)
+        ? preSelection.selectionId
+        : DEFAULT_AUTO_BAN_LEADER_ID;
+
+    // Clear the pre-selection so clients don't see stale state
+    if (preSelection) {
+      await ctx.db.delete(preSelection._id);
+    }
+
+    await performLeaderPickBan(ctx, lobbyId, leaderIdToUse, teamTurn);
   },
 });
 
