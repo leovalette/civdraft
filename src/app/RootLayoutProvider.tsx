@@ -1,6 +1,7 @@
 "use client";
 
 import { ClerkProvider } from "@clerk/nextjs";
+import { Analytics } from "@vercel/analytics/next";
 import type { ComponentType, ReactNode } from "react";
 import { UserInitializer } from "@/components/UserInitializer";
 import ConvexClientProvider from "./ConvexClientProvider";
@@ -17,6 +18,7 @@ export function RootLayoutProvider({ children }: { children: ReactNode }) {
         <LeadersMapsProvider>
           <UserInitializer />
           {children}
+          <Analytics />
         </LeadersMapsProvider>
       </ConvexClientProvider>
     </ClerkProviderComponent>
