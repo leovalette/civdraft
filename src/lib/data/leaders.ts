@@ -609,4 +609,32 @@ export const leaders: Leader[] = [
     imageName: "julius_caesar.png",
     name: "Julius Caesar",
   },
+  {
+    id: "j57fvafcsgyq6vmyc3djjxk9d5q5q5av",
+    civilization: "Taino",
+    filters: ["Anacoana", "Taino"],
+    imageName: "anacoana.png",
+    name: "Anacoana",
+  },
+  {
+    id: "j57fvafcsgyq6vmqqdjjxk9d5q5q5av",
+    civilization: "Poland",
+    filters: ["Stanislaw II", "Poland"],
+    imageName: "stanislawII.png",
+    name: "Stanislaw II",
+  },
+  {
+    id: "j57fvafcsgqqsdvmqqdjjxk9d5q5q5av",
+    civilization: "Austria",
+    filters: ["Maria Theresa", "Austria"],
+    imageName: "maria_theresa.png",
+    name: "Maria Theresa",
+  },
+  {
+    id: "j57fvafqsssvmqqdjjxk9d5q5q5av",
+    civilization: "Goths",
+    filters: ["Theodoric", "Goths"],
+    imageName: "theodoric.png",
+    name: "Theodoric",
+  },
 ];
