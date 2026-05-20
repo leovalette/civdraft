@@ -135,4 +135,9 @@ export const maps: Map[] = [
     imageName: "Highlands.png",
     name: "Highlands",
   },
+  {
+    id: "j97fshp3bahat45qd184w89aadasqayb",
+    imageName: "Pangea_Ultima.png",
+    name: "Pangea Ultima",
+  },
 ];
