@@ -612,9 +612,9 @@ export const leaders: Leader[] = [
   {
     id: "j57fvafcsgyq6vmyc3djjxk9d5q5q5av",
     civilization: "Taino",
-    filters: ["Anacoana", "Taino"],
-    imageName: "anacoana.png",
-    name: "Anacoana",
+    filters: ["Anacaona", "Taino"],
+    imageName: "anacaona.png",
+    name: "Anacaona",
   },
   {
     id: "j57fvafcsgyq6vmqqdjjxk9d5q5q5av",
