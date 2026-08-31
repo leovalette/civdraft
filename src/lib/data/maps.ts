@@ -91,6 +91,11 @@ export const maps: Map[] = [
     name: "Rich Highlands",
   },
   {
+    id: "rich-riverlands",
+    imageName: "Rich_Riverlands.png",
+    name: "Rich Riverlands",
+  },
+  {
     id: "j97atmt0t2vfyqsf0zj6767t4s7sp8tt",
     imageName: "Pangaea_Classic.png",
     name: "Pangaea Classic",
